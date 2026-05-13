@@ -57,18 +57,24 @@ npm scripts 是 Agent 的内部实现工具，不是面向用户的主要使用�
 
 ## 安装为 Skill
 
-Codex 风格的本地 skill：
+推荐使用 `skills` 安装器：
+
+```bash
+npx skills
+npx skills add git@github.com:lord97j/ai-resume-publisher.git
+```
+
+如果你更偏好 HTTPS，而不是 SSH：
+
+```bash
+npx skills add https://github.com/lord97j/ai-resume-publisher
+```
+
+如果是在本仓库内做开发，可以用软链接，这样 Agent 能立刻读到你的本地改动：
 
 ```bash
 mkdir -p ~/.codex/skills
 ln -s "$PWD" ~/.codex/skills/ai-resume-publisher
-```
-
-或者只复制 skill 入口：
-
-```bash
-mkdir -p ~/.codex/skills/ai-resume-publisher
-cp SKILL.md ~/.codex/skills/ai-resume-publisher/SKILL.md
 ```
 
 然后可以对 Agent 说：

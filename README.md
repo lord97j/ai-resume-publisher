@@ -57,18 +57,24 @@ The npm scripts are implementation tools for the Agent. They are not the user-fa
 
 ## Install As A Skill
 
-For Codex-style local skills:
+Use the `skills` installer:
+
+```bash
+npx skills
+npx skills add git@github.com:lord97j/ai-resume-publisher.git
+```
+
+If you prefer HTTPS instead of SSH:
+
+```bash
+npx skills add https://github.com/lord97j/ai-resume-publisher
+```
+
+For local development on this repository, use a symlink so your Agent sees edits immediately:
 
 ```bash
 mkdir -p ~/.codex/skills
 ln -s "$PWD" ~/.codex/skills/ai-resume-publisher
-```
-
-Or copy only the skill entrypoint:
-
-```bash
-mkdir -p ~/.codex/skills/ai-resume-publisher
-cp SKILL.md ~/.codex/skills/ai-resume-publisher/SKILL.md
 ```
 
 Then ask your Agent something like:
