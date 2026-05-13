@@ -27,6 +27,13 @@ jobs:
           node-version: 20
       - uses: browser-actions/setup-chrome@v1
         id: setup-chrome
+      - name: Encrypt private resume
+        id: encrypt
+        run: |
+          ENCRYPT_OUTPUT="$(npm run encrypt 2>&1)"
+          echo "$ENCRYPT_OUTPUT"
+          KEY="$(echo "$ENCRYPT_OUTPUT" | grep -oP 'key=\K[A-Za-z0-9_-]+')"
+          echo "decrypt_key=${KEY}" >> "$GITHUB_OUTPUT"
       - name: Build static resume
         run: npm run build
       - name: Export timestamped PDF
@@ -85,10 +92,20 @@ jobs:
         run: |
           PDF_PATH="$(ls release/resume-*.pdf | head -n 1)"
           TAG="resume-${{ steps.target.outputs.safe_ref }}-${RESUME_VERSION}-${GITHUB_RUN_NUMBER}"
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+          OWNER="${GITHUB_REPOSITORY_OWNER}"
+          BASE_URL="https://${OWNER}.github.io/${REPO_NAME}/"
+          NOTES="Automated resume PDF export for ${GITHUB_SHA}."
+          NOTES="${NOTES}"$'\n\n'"**Resume URL**: ${BASE_URL}"
+          if [[ "${{ steps.target.outputs.is_jd }}" == "true" ]]; then
+            JD_URL="${BASE_URL}${{ steps.target.outputs.target_folder }}/"
+            NOTES="${NOTES}"$'\n'"**JD Resume URL**: ${JD_URL}"
+            NOTES="${NOTES}"$'\n'"**Decrypt URL**: ${JD_URL}#key=${{ steps.encrypt.outputs.decrypt_key }}"
+          fi
           gh release create "$TAG" "$PDF_PATH" \
             --repo "$GITHUB_REPOSITORY" \
             --title "Resume ${{ github.ref_name }} ${RESUME_VERSION}" \
-            --notes "Automated resume PDF export for ${GITHUB_SHA}."
+            --notes "$NOTES"
       - name: Trigger main Pages deployment for JD branch
         if: steps.target.outputs.is_jd == 'true'
         env:
