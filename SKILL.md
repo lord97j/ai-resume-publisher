@@ -70,7 +70,22 @@ Create a Git-native resume homepage from `resume.json`, then generate JD-specifi
 When the user asks to publish through GitHub:
 
 1. Verify the repository has an `origin` remote.
-2. Run:
+2. Verify GitHub CLI auth:
+
+   ```bash
+   gh auth status
+   ```
+
+3. Enable GitHub Pages in workflow mode if `gh api repos/<owner>/<repo>/pages` returns 404:
+
+   ```bash
+   gh api -X POST repos/<owner>/<repo>/pages \
+     -f build_type=workflow \
+     -f 'source[branch]=main' \
+     -f 'source[path]=/'
+   ```
+
+4. Run local validation:
 
    ```bash
    npm run encrypt
@@ -78,15 +93,34 @@ When the user asks to publish through GitHub:
    npm run export:pdf
    ```
 
-3. Commit source files plus `public/private-resume.enc.json`. The encrypted payload is safe to publish; the fragment key is not.
-4. Push `main`.
-5. Watch the `Publish Resume Page` GitHub Actions run.
-6. Confirm:
+5. Browser-check the local public page:
+   - public page shows redacted contact fields;
+   - `/#key=...` unlocks full contact fields;
+   - PDF export exists under `release/`.
+6. Commit source files plus `public/private-resume.enc.json`. The encrypted payload is safe to publish; the fragment key is not.
+7. Push `main`.
+8. Watch the `Publish Resume Page` GitHub Actions run:
+
+   ```bash
+   gh run watch <run-id> --repo <owner>/<repo> --exit-status
+   ```
+
+   Or trigger it manually after enabling Pages:
+
+   ```bash
+   gh workflow run pages.yml --repo <owner>/<repo> --ref main
+   ```
+
+9. Confirm:
    - Pages deployment succeeded;
    - GitHub Release was created;
    - Release contains a timestamped PDF asset;
    - public URL loads without exposing raw sensitive fields;
    - private URL with `#key=...` unlocks full contact details.
+10. Return:
+    - `https://<owner>.github.io/<repo>/`
+    - `https://<owner>.github.io/<repo>/#key=<base64url-key>`
+    - `https://github.com/<owner>/<repo>/releases/latest`
 
 ## Output Checklist
 
