@@ -10,6 +10,7 @@ on:
 permissions:
   contents: write
   pages: write
+  id-token: write
   actions: read
 
 concurrency:
@@ -19,6 +20,9 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -56,21 +60,6 @@ jobs:
             echo "jd_slug=" >> "$GITHUB_OUTPUT"
             echo "target_folder=" >> "$GITHUB_OUTPUT"
           fi
-      - name: Configure GitHub Pages
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if gh api "repos/${GITHUB_REPOSITORY}/pages" >/dev/null 2>&1; then
-            gh api -X PUT "repos/${GITHUB_REPOSITORY}/pages" \
-              -f build_type=legacy \
-              -f 'source[branch]=gh-pages' \
-              -f 'source[path]=/'
-          else
-            gh api -X POST "repos/${GITHUB_REPOSITORY}/pages" \
-              -f build_type=legacy \
-              -f 'source[branch]=gh-pages' \
-              -f 'source[path]=/'
-          fi
       - name: Deploy main resume to gh-pages root
         if: steps.target.outputs.is_jd == 'false'
         uses: JamesIves/github-pages-deploy-action@v4
@@ -89,6 +78,20 @@ jobs:
           folder: dist
           target-folder: ${{ steps.target.outputs.target_folder }}
           clean: true
+      - name: Checkout aggregated gh-pages site
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: pages-site
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload aggregated Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: pages-site
+      - name: Deploy aggregated Pages site
+        id: deployment
+        uses: actions/deploy-pages@v4
       - name: Create release with PDF
         env:
           GH_TOKEN: ${{ github.token }}
