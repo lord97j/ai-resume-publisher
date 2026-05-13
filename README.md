@@ -13,7 +13,7 @@ Generate, tailor, encrypt, publish, and export AI resume pages from Git branches
 
 **AI Resume Publisher** is an open-source starter for job seekers who want a Git-native personal resume homepage. It ships as a static-site template plus an AI/Codex skill: the public `main` branch hosts a redacted resume, while each job description can become a tailored branch or variant with its own preview, PDF, and review notes.
 
-**Quick Start** • **How It Works** • **Search Tools** • **Documentation** • **Configuration** • **Troubleshooting** • **License**
+[Quick Start](#quick-start) • [How It Works](#how-it-works) • [Search Tools](#search-tools) • [Documentation](#documentation) • [Configuration](#configuration) • [Troubleshooting](#troubleshooting) • [License](#open-source-license)
 
 ## Demo
 
