@@ -15,7 +15,7 @@
 
 本仓库的定位参考了 [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md)：用 Markdown 文件把设计和执行意图交给 Agent。这里的 `SKILL.md` 说明什么时候使用该 skill，`AGENTS.md` 说明 Agent 如何操作本仓库，`design-md/` 提供视觉参考，简历网站代码只是起点。
 
-[Agent 流程](#agent-流程) • [安装为 Skill](#安装为-skill) • [仓库结构](#仓库结构) • [设计参考](#设计参考) • [发布](#发布) • [排障](#排障) • [开源协议](#开源协议)
+[Agent 流程](#agent-流程) • [安装为 Skill](#安装为-skill) • [仓库结构](#仓库结构) • [JD 分支](#jd-分支) • [发布](#发布) • [排障](#排障) • [开源协议](#开源协议)
 
 ## Demo
 
@@ -50,8 +50,8 @@
 6. Agent 阅读 `AGENTS.md`、`SKILL.md`、`resume.json` 和最适合的 `design-md/*.md`。
 7. Agent 按用户履历改造网站内容、结构、文案语气和视觉表现。
 8. Agent 本地构建、预览、检查脱敏和加密解锁。
-9. Agent 询问用户要发布 `main` 还是其他分支。
-10. Agent 自动发布，并把公开地址、加密访问地址、PDF/Release 地址、加密 key 等必要结果返回给用户。
+9. Agent 从 `main` 发布主简历，从 `jd/<company-role>` 分支发布岗位定制简历。
+10. Agent 自动发布，并把公开地址、JD 地址、加密访问地址、PDF/Release 地址、加密 key 等必要结果返回给用户。
 
 npm scripts 是 Agent 的内部实现工具，不是面向用户的主要使用入口。
 
@@ -100,7 +100,7 @@ ln -s "$PWD" ~/.codex/skills/ai-resume-publisher
 | `scripts/export-pdf.js` | 从静态页面导出带时间版本的 PDF |
 | `scripts/tailor.js` | 创建 JD 定制版本的可审查目录 |
 | `variants/<slug>/` | 可选的岗位或公司定制简历版本 |
-| `.github/workflows/pages.yml` | GitHub Pages 和 PDF Release 参考 workflow |
+| `.github/workflows/pages.yml` | 把 `main` 和 `jd/*` 分支聚合发布到同一个 GitHub Pages 站点 |
 
 ## 设计参考
 
@@ -133,6 +133,13 @@ npm run tailor -- --jd examples/frontend-jd.md --slug acme-frontend
 npm run build -- --variant acme-frontend
 ```
 
+切换到 `jd/<slug>` 后，生成分支根目录定制简历：
+
+```bash
+npm run tailor:branch -- --jd examples/frontend-jd.md --slug acme-frontend
+npm run build
+```
+
 指定视觉方向构建：
 
 ```bash
@@ -150,16 +157,43 @@ node scripts/recommend-style.js --role "后端架构师"
 node scripts/recommend-style.js --role "AI 研究"
 ```
 
+## JD 分支
+
+本仓库使用 GitHub Pages 聚合发布方案支持岗位定制简历：
+
+- `main` 是主简历。
+- `jd/<slug>` 分支是从主简历派生的岗位定制简历。
+- workflow 会构建每个推送的分支，并把结果部署到统一的 `gh-pages` 发布分支。
+- 主简历地址：`https://<owner>.github.io/<repo>/`
+- JD 简历地址：`https://<owner>.github.io/<repo>/jd/<slug>/`
+- JD PDF 地址：`https://<owner>.github.io/<repo>/jd/<slug>/resume.pdf`
+- 完整私密信息仍然通过加密密文和 `#key=...` URL fragment 解锁。
+
+面向目标岗位的 Agent 流程示例：
+
+```bash
+git switch main
+git pull
+git switch -c jd/apple-frontend
+npm run tailor:branch -- --jd path/to/apple-jd.md --slug apple-frontend
+# Agent 编辑 resume.json，并核对所有事实。
+npm run build
+npm run export:pdf
+git push -u origin jd/apple-frontend
+```
+
+GitHub Action 会把该分支发布到 `/jd/apple-frontend/`，并创建带时间版本的 PDF Release。
+
 ## 发布
 
 当用户同意通过 GitHub 发布时，Agent 应该：
 
 1. 确认仓库 owner、仓库名和隐私设置。
-2. 确认发布 `main` 还是其他分支。
+2. 确认发布主简历 `main`，还是岗位定制分支 `jd/<slug>`。
 3. 完成本地构建、浏览器预览、PDF、脱敏和加密解锁检查。
 4. 不要把 `#key=...` 提交到仓库、issue、PR 描述或公开日志。
 5. 推送用户确认的分支。
-6. 检查 GitHub Pages、GitHub Actions 和 Release。
+6. 检查 GitHub Pages、`gh-pages` 聚合分支、GitHub Actions 和 Release。
 7. 返回：
 
 ```txt
@@ -168,6 +202,12 @@ https://<owner>.github.io/<repo>/
 
 加密完整简历：
 https://<owner>.github.io/<repo>/#key=<base64url-key>
+
+JD 简历：
+https://<owner>.github.io/<repo>/jd/<slug>/
+
+JD PDF：
+https://<owner>.github.io/<repo>/jd/<slug>/resume.pdf
 
 PDF 历史版本：
 https://github.com/<owner>/<repo>/releases
@@ -186,8 +226,9 @@ https://github.com/<owner>/<repo>/releases/latest
 | 问题 | 处理方式 |
 |---|---|
 | Agent 把本仓库当成 npm 包 | 先读 `SKILL.md` 和 `AGENTS.md`；npm scripts 只是内部构建辅助 |
-| `Get Pages site failed` | 用 `gh api -X POST repos/<owner>/<repo>/pages -f build_type=workflow ...` 启用 Pages |
+| `Get Pages site failed` | workflow 会配置 Pages 从 `gh-pages` 发布；检查 token 是否有 `pages: write` 权限 |
 | Pages 返回 `404` | 等 workflow 完成后，运行 `gh api repos/<owner>/<repo>/pages` |
+| JD 分支访问不到 | 确认分支名以 `jd/` 开头，并访问 `https://<owner>.github.io/<repo>/jd/<slug>/` |
 | 私密解锁失败 | 确认 `public/private-resume.enc.json` 和 `#key=...` 来自同一次 `npm run encrypt` |
 | PDF 导出找不到 Chrome | 设置 `CHROME_BIN=/path/to/chrome` 后重试 `npm run export:pdf` |
 | Release 没生成 | 用 `gh run view <run-id> --log-failed` 查看日志，并检查 workflow `contents: write` 权限 |

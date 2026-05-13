@@ -15,7 +15,7 @@ Agent-readable skill for turning a resume into a personalized, publishable websi
 
 This repo is inspired by the positioning of [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md): markdown files give Agents design and build intent they can apply directly. Here, `SKILL.md` explains when to use the skill, `AGENTS.md` explains how to operate the repo, `design-md/` gives visual references, and the existing resume site code is only the starting point.
 
-[Agent Workflow](#agent-workflow) • [Install As A Skill](#install-as-a-skill) • [Repository Map](#repository-map) • [Design References](#design-references) • [Publishing](#publishing) • [Troubleshooting](#troubleshooting) • [License](#open-source-license)
+[Agent Workflow](#agent-workflow) • [Install As A Skill](#install-as-a-skill) • [Repository Map](#repository-map) • [JD Branches](#jd-branches) • [Publishing](#publishing) • [Troubleshooting](#troubleshooting) • [License](#open-source-license)
 
 ## Demo
 
@@ -50,8 +50,8 @@ The intended flow is Agent-led:
 6. Agent reads `AGENTS.md`, `SKILL.md`, `resume.json`, and the best-fit `design-md/*.md` file.
 7. Agent edits the website so the content, structure, writing tone, and visual direction fit the user's actual background.
 8. Agent runs local validation and browser checks before publishing.
-9. Agent asks whether to publish from `main` or another branch.
-10. Agent publishes, then returns the public URL, private unlock URL fragment, PDF/release URL, and any encryption key material the user needs.
+9. Agent publishes the canonical resume from `main`, and role-specific resumes from `jd/<company-role>` branches.
+10. Agent returns the public URL, JD URL, private unlock URL fragment, PDF/release URL, and any encryption key material the user needs.
 
 The npm scripts are implementation tools for the Agent. They are not the user-facing installation or publishing experience.
 
@@ -100,7 +100,7 @@ build the personal website, test locally, and publish when I confirm the branch.
 | `scripts/export-pdf.js` | Exports a timestamped PDF from the built static site |
 | `scripts/tailor.js` | Creates a reviewable JD-specific variant scaffold |
 | `variants/<slug>/` | Optional role or company-specific resume variants |
-| `.github/workflows/pages.yml` | Reference GitHub Pages and PDF release workflow |
+| `.github/workflows/pages.yml` | Publishes `main` and `jd/*` branches into one GitHub Pages site |
 
 ## Design References
 
@@ -133,6 +133,13 @@ npm run tailor -- --jd examples/frontend-jd.md --slug acme-frontend
 npm run build -- --variant acme-frontend
 ```
 
+Scaffold a JD branch after switching to `jd/<slug>`:
+
+```bash
+npm run tailor:branch -- --jd examples/frontend-jd.md --slug acme-frontend
+npm run build
+```
+
 Build with a specific visual direction:
 
 ```bash
@@ -150,16 +157,43 @@ node scripts/recommend-style.js --role "backend architect"
 node scripts/recommend-style.js --role "AI research"
 ```
 
+## JD Branches
+
+This repo uses a GitHub Pages aggregation workflow for role-specific resumes:
+
+- `main` is the canonical public resume.
+- `jd/<slug>` branches are job-specific resumes derived from the main resume.
+- The workflow builds each pushed branch and deploys it to one `gh-pages` publishing branch.
+- Main resume URL: `https://<owner>.github.io/<repo>/`
+- JD resume URL: `https://<owner>.github.io/<repo>/jd/<slug>/`
+- JD PDF URL: `https://<owner>.github.io/<repo>/jd/<slug>/resume.pdf`
+- Full private details still use encrypted payloads and `#key=...` URL fragments.
+
+Example Agent flow for a target role:
+
+```bash
+git switch main
+git pull
+git switch -c jd/apple-frontend
+npm run tailor:branch -- --jd path/to/apple-jd.md --slug apple-frontend
+# Agent edits resume.json and validates facts.
+npm run build
+npm run export:pdf
+git push -u origin jd/apple-frontend
+```
+
+The GitHub Action publishes the branch to `/jd/apple-frontend/` and creates a timestamped PDF release.
+
 ## Publishing
 
 When the user approves GitHub publishing, the Agent should:
 
 1. Confirm repository ownership and privacy settings.
-2. Confirm whether publication should happen from `main` or a separate branch.
+2. Confirm whether this is the canonical resume on `main` or a JD resume on `jd/<slug>`.
 3. Run local validation.
 4. Keep the printed `#key=...` out of commits, issues, PR descriptions, and public logs.
 5. Push the approved branch.
-6. Verify GitHub Pages, GitHub Actions, and releases.
+6. Verify GitHub Pages, the `gh-pages` aggregation branch, GitHub Actions, and releases.
 7. Return:
 
 ```txt
@@ -168,6 +202,12 @@ https://<owner>.github.io/<repo>/
 
 Encrypted URL:
 https://<owner>.github.io/<repo>/#key=<base64url-key>
+
+JD URL:
+https://<owner>.github.io/<repo>/jd/<slug>/
+
+JD PDF:
+https://<owner>.github.io/<repo>/jd/<slug>/resume.pdf
 
 PDF history:
 https://github.com/<owner>/<repo>/releases
@@ -186,8 +226,9 @@ For this reference repository:
 | Problem | Fix |
 |---|---|
 | Agent treats this as an npm package | Read `SKILL.md` and `AGENTS.md`; npm scripts are internal build helpers |
-| `Get Pages site failed` | Enable Pages with `gh api -X POST repos/<owner>/<repo>/pages -f build_type=workflow ...` |
+| `Get Pages site failed` | The workflow configures Pages to publish from `gh-pages`; check token `pages: write` permission |
 | Pages returns `404` | Wait for the workflow to finish, then check `gh api repos/<owner>/<repo>/pages` |
+| JD branch is not visible | Make sure the branch name starts with `jd/` and check `https://<owner>.github.io/<repo>/jd/<slug>/` |
 | Private unlock fails | Make sure `public/private-resume.enc.json` matches the printed `#key=...` from the same `npm run encrypt` run |
 | PDF export cannot find Chrome | Set `CHROME_BIN=/path/to/chrome` and rerun `npm run export:pdf` |
 | Release was not created | Check `gh run view <run-id> --log-failed` and repository `contents: write` workflow permission |

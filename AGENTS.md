@@ -44,7 +44,8 @@ This repository is an Agent skill plus a reference resume-site implementation. Y
 - Keep layout responsive and readable before adding flourish.
 - Show the user's strongest evidence in the first viewport: name, role, positioning, core proof, and contact/profile affordances.
 - Avoid making the page look like a generic SaaS landing page when the user's goal is a resume or personal site.
-- If creating JD-specific versions, keep them under `variants/<slug>/` and explain changes in `notes.md`.
+- If creating JD-specific versions for local review, keep them under `variants/<slug>/` and explain changes in `notes.md`.
+- If creating a publishable JD-specific resume, use a `jd/<slug>` branch and keep the optimized resume in the branch root `resume.json`.
 
 ## Local Validation
 
@@ -79,7 +80,7 @@ Before any external action, ask for user consent:
 - Enable GitHub Pages.
 - Push a branch.
 - Publish from `main`.
-- Publish from an alternate branch or preview host.
+- Publish from a `jd/<slug>` branch or preview host.
 
 When publishing succeeds, return:
 
@@ -90,8 +91,37 @@ When publishing succeeds, return:
 - commit hash or short summary;
 - private unlock key material, clearly labeled for the user only.
 
+## JD Branch Publishing
+
+Use this flow when a user already has a resume site and wants a dedicated link for a target role:
+
+```bash
+git switch main
+git pull
+git switch -c jd/company-role
+npm run tailor:branch -- --jd path/to/jd.md --slug company-role
+```
+
+Then edit `resume.json` in the branch root. Keep changes truthful and note uncertain claims in `variants/company-role/notes.md`.
+
+After validation, push the branch:
+
+```bash
+npm run build
+npm run export:pdf
+git push -u origin jd/company-role
+```
+
+The workflow deploys:
+
+- `main` to `https://<owner>.github.io/<repo>/`
+- `jd/company-role` to `https://<owner>.github.io/<repo>/jd/company-role/`
+- branch PDF to `https://<owner>.github.io/<repo>/jd/company-role/resume.pdf`
+
+GitHub Pages cannot password-protect different subdirectories. Use encrypted resume payloads and `#key=...` fragments for private contact details.
+
 ## Branching
 
 - Use `main` for the canonical public resume only after user confirmation.
-- Use descriptive branches such as `resume/<slug>` or `jd/<company-role>` for experiments and role-specific variants.
+- Use `jd/<company-role>` for published role-specific variants.
 - Do not maintain one branch per visual style unless the user explicitly asks for that workflow; visual style should usually be data/config plus implementation.

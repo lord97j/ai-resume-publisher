@@ -2,25 +2,23 @@ name: Publish Resume Page
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - "jd/**"
   workflow_dispatch:
 
 permissions:
   contents: write
   pages: write
-  id-token: write
   actions: read
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -38,22 +36,78 @@ jobs:
           SHORT_SHA="${GITHUB_SHA::7}"
           echo "RESUME_VERSION=${VERSION}-${SHORT_SHA}" >> "$GITHUB_ENV"
           npm run export:pdf -- --version "${VERSION}-${SHORT_SHA}"
+          cp "release/resume-${VERSION}-${SHORT_SHA}.pdf" dist/resume.pdf
+          touch dist/.nojekyll
+      - name: Resolve deploy target
+        id: target
+        run: |
+          REF_NAME="${GITHUB_REF_NAME}"
+          SAFE_REF="$(printf '%s' "$REF_NAME" | tr '/[:upper:]' '-[:lower:]' | sed 's/[^a-z0-9-]/-/g; s/--*/-/g; s/^-//; s/-$//')"
+          echo "safe_ref=${SAFE_REF}" >> "$GITHUB_OUTPUT"
+
+          if [[ "$REF_NAME" == jd/* ]]; then
+            JD_SLUG="${REF_NAME#jd/}"
+            JD_SLUG="$(printf '%s' "$JD_SLUG" | tr '/[:upper:]' '-[:lower:]' | sed 's/[^a-z0-9-]/-/g; s/--*/-/g; s/^-//; s/-$//')"
+            echo "is_jd=true" >> "$GITHUB_OUTPUT"
+            echo "jd_slug=${JD_SLUG}" >> "$GITHUB_OUTPUT"
+            echo "target_folder=jd/${JD_SLUG}" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_jd=false" >> "$GITHUB_OUTPUT"
+            echo "jd_slug=" >> "$GITHUB_OUTPUT"
+            echo "target_folder=" >> "$GITHUB_OUTPUT"
+          fi
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/${GITHUB_REPOSITORY}/pages" >/dev/null 2>&1; then
+            gh api -X PUT "repos/${GITHUB_REPOSITORY}/pages" \
+              -f build_type=legacy \
+              -f 'source[branch]=gh-pages' \
+              -f 'source[path]=/'
+          else
+            gh api -X POST "repos/${GITHUB_REPOSITORY}/pages" \
+              -f build_type=legacy \
+              -f 'source[branch]=gh-pages' \
+              -f 'source[path]=/'
+          fi
+      - name: Deploy main resume to gh-pages root
+        if: steps.target.outputs.is_jd == 'false'
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          path: dist
+          branch: gh-pages
+          folder: dist
+          clean: true
+          clean-exclude: |
+            jd/**
+            CNAME
+      - name: Deploy JD resume to gh-pages subdirectory
+        if: steps.target.outputs.is_jd == 'true'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: dist
+          target-folder: ${{ steps.target.outputs.target_folder }}
+          clean: true
       - name: Create release with PDF
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           PDF_PATH="$(ls release/resume-*.pdf | head -n 1)"
-          TAG="resume-${RESUME_VERSION}"
+          TAG="resume-${{ steps.target.outputs.safe_ref }}-${RESUME_VERSION}"
           gh release create "$TAG" "$PDF_PATH" \
             --repo "$GITHUB_REPOSITORY" \
-            --title "Resume ${RESUME_VERSION}" \
+            --title "Resume ${{ github.ref_name }} ${RESUME_VERSION}" \
             --notes "Automated resume PDF export for ${GITHUB_SHA}."
-      - name: Deploy GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Print published paths
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+          OWNER="${GITHUB_REPOSITORY_OWNER}"
+          BASE_URL="https://${OWNER}.github.io/${REPO_NAME}/"
+          echo "Main resume: ${BASE_URL}"
+          if [[ "${{ steps.target.outputs.is_jd }}" == "true" ]]; then
+            echo "JD resume: ${BASE_URL}${{ steps.target.outputs.target_folder }}/"
+            echo "JD PDF: ${BASE_URL}${{ steps.target.outputs.target_folder }}/resume.pdf"
+          else
+            echo "Main PDF: ${BASE_URL}resume.pdf"
+          fi

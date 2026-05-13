@@ -41,7 +41,7 @@ Before editing, read:
 1. Confirm the user's desired output:
    - public resume site only;
    - public site plus encrypted full resume;
-   - role/JD-specific variant;
+   - role/JD-specific branch;
    - GitHub Pages or another host.
 2. If the user wants GitHub publishing, install or verify GitHub tooling with consent:
    - `git`
@@ -56,13 +56,22 @@ Before editing, read:
    - inspect the most relevant `design-md/*.md`;
    - choose based on the user's role, industry, seniority, and content density.
 7. Update the site implementation so it serves the resume content. The current template is a reference, not a hard limit.
-8. If there is a JD, create a reviewable variant:
+8. If there is a JD for local review, create a reviewable variant:
 
    ```bash
    npm run tailor -- --jd path/to/jd.md --slug company-role
    ```
 
-9. Edit the variant conservatively:
+   If the user already has a published resume site and wants a dedicated JD link, create a branch instead:
+
+   ```bash
+   git switch main
+   git pull
+   git switch -c jd/company-role
+   npm run tailor:branch -- --jd path/to/jd.md --slug company-role
+   ```
+
+9. Edit the variant or JD branch root `resume.json` conservatively:
    - sharpen summary toward the role;
    - reorder skills and projects for relevance;
    - tighten bullets using JD language only when truthful;
@@ -94,10 +103,11 @@ Before editing, read:
     - `/#key=...` unlocks full contact fields when encryption is enabled;
     - layout is readable on desktop and mobile;
     - PDF export exists under `release/`.
-14. Ask whether to publish from `main` or another branch.
+14. Ask whether this should publish as the canonical `main` resume or as a JD branch under `jd/<slug>`.
 15. Publish only after user confirmation.
 16. Return final outputs:
     - public URL;
+    - JD URL when applicable;
     - encrypted URL with fragment key when applicable;
     - PDF or releases URL;
     - branch name and commit summary;
@@ -114,12 +124,12 @@ When the user asks to publish through GitHub:
    gh auth status
    ```
 
-3. Enable GitHub Pages in workflow mode if `gh api repos/<owner>/<repo>/pages` returns 404:
+3. This repository publishes GitHub Pages from the generated `gh-pages` branch. The workflow configures that source automatically, but you can do it manually if needed:
 
    ```bash
    gh api -X POST repos/<owner>/<repo>/pages \
-     -f build_type=workflow \
-     -f 'source[branch]=main' \
+     -f build_type=legacy \
+     -f 'source[branch]=gh-pages' \
      -f 'source[path]=/'
    ```
 
@@ -131,7 +141,9 @@ When the user asks to publish through GitHub:
    ```
 
 5. Commit source files plus `public/private-resume.enc.json` if encrypted mode is used. The encrypted payload is safe to publish; the fragment key is not.
-6. Push the user-approved branch.
+6. Push the user-approved branch:
+   - `main` publishes to `/`;
+   - `jd/<slug>` publishes to `/jd/<slug>/`.
 7. Watch the GitHub Actions run:
 
    ```bash
@@ -141,8 +153,8 @@ When the user asks to publish through GitHub:
 
 8. Confirm:
    - Pages deployment succeeded;
-   - GitHub Release was created if the workflow ran on `main`;
-   - Release contains a timestamped PDF asset;
+   - `gh-pages` contains root files for `main` or `jd/<slug>/` files for the JD branch;
+   - GitHub Release was created with a timestamped PDF asset;
    - public URL loads without exposing raw sensitive fields;
    - private URL with `#key=...` unlocks full contact details when applicable.
 
@@ -155,4 +167,5 @@ When the user asks to publish through GitHub:
 - Contact info is hidden unless decrypted in the browser.
 - Print/PDF export works.
 - Variant notes explain every meaningful adjustment.
+- For JD branches, `https://<owner>.github.io/<repo>/jd/<slug>/` and `resume.pdf` load.
 - The user receives URLs, branch information, and any private unlock key.

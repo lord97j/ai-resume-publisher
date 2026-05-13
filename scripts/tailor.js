@@ -21,9 +21,14 @@ await writeFile(path.join(variantDir, "resume.json"), `${JSON.stringify(variantR
 await writeFile(path.join(variantDir, "jd.md"), jd);
 await writeFile(path.join(variantDir, "notes.md"), renderNotes(slug, keywords));
 
+if (args["branch-root"]) {
+  await writeFile(path.join(root, "resume.json"), `${JSON.stringify(variantResume, null, 2)}\n`);
+  console.log("Updated root resume.json for the current JD branch.");
+}
+
 console.log(`Created variant at variants/${slug}`);
-console.log("Next: edit the variant resume conservatively, then run:");
-console.log(`npm run build -- --variant ${slug}`);
+console.log("Next: edit the resume conservatively, then run:");
+console.log(args["branch-root"] ? "npm run build" : `npm run build -- --variant ${slug}`);
 
 function parseArgs(argv) {
   const parsed = {};
