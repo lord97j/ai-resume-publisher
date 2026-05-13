@@ -1,69 +1,107 @@
 # AI Resume Publisher Skill
 
-Use this skill when a job seeker provides a first-draft resume, a job description, or asks to publish a tailored static resume page.
+Use this skill when a user wants an Agent to turn resume material into a personalized, publishable resume website.
+
+This repository is a skill and reference implementation for coding Agents such as Codex or Claude Code. Do not treat it as an end-user npm package. The user should not need to know the scripts; the Agent uses them to build, test, encrypt, and publish.
 
 ## Goal
 
-Create a Git-native resume homepage from `resume.json`, then generate JD-specific variants that can be published from branches or static hosting previews.
+Create a truthful, visually appropriate personal resume website from the user's resume, with optional encrypted private details, PDF export, and GitHub Pages publishing.
 
 ## Inputs
 
-- Base resume: Markdown, PDF text, plain text, or existing `resume.json`.
-- Optional JD: pasted job description or URL content provided by the user.
-- Optional target: GitHub Pages, Vercel, or local preview.
+- Base resume: pasted text, Markdown, PDF-extracted text, plain text, or existing `resume.json`.
+- Optional target role or JD.
+- Optional preferred publishing target: GitHub Pages, branch preview, Vercel, or local-only.
+- Optional privacy preference: public redacted page only, or public page plus encrypted full resume.
+
+## Required Repo Reading
+
+Before editing, read:
+
+1. `AGENTS.md`
+2. `resume.json`
+3. `design-md/README.md`
+4. The most relevant `design-md/*.md`
+5. Existing template and scripts only as needed
 
 ## Non-Negotiable Rules
 
 - Preserve facts. Never invent employers, degrees, titles, dates, certifications, awards, or metrics.
+- Do not exaggerate seniority or claim technologies the user did not provide.
+- Keep uncertain claims in notes for user confirmation.
 - Do not expose private contact fields on the public homepage.
 - Treat hidden paths as convenience links, not security.
 - For private full resumes, use encrypted payloads and URL fragment keys.
-- Keep every JD-specific change reviewable in `variants/<slug>/notes.md`.
+- Never commit the printed `#key=...` value.
+- Ask before creating repositories, pushing branches, enabling Pages, or publishing publicly.
 
-## Workflow
+## Agent Workflow
 
-1. Normalize the resume into JSON Resume compatible `resume.json`.
-2. Confirm sensitive fields are listed in `publisher.redact`.
-3. If the user wants a private full-resume URL, run:
-
-   ```bash
-   npm run encrypt
-   ```
-
-   Capture the printed `/#key=...` suffix and keep it out of commits, logs, issues, and PR descriptions.
-
-4. Run `npm run build` to create the public redacted homepage.
-5. Run `npm run export:pdf` to verify the static page can become a PDF.
-6. For a JD, create a slug such as `company-role` and run:
+1. Confirm the user's desired output:
+   - public resume site only;
+   - public site plus encrypted full resume;
+   - role/JD-specific variant;
+   - GitHub Pages or another host.
+2. If the user wants GitHub publishing, install or verify GitHub tooling with consent:
+   - `git`
+   - `gh auth status`
+   - repository owner/name
+   - private repository or fork preference
+3. If needed and approved, create a private repository or fork this repo.
+4. Normalize the user's resume into `resume.json`.
+5. Set `publisher.redact` for public privacy.
+6. Choose a design direction:
+   - read `design-md/README.md`;
+   - inspect the most relevant `design-md/*.md`;
+   - choose based on the user's role, industry, seniority, and content density.
+7. Update the site implementation so it serves the resume content. The current template is a reference, not a hard limit.
+8. If there is a JD, create a reviewable variant:
 
    ```bash
    npm run tailor -- --jd path/to/jd.md --slug company-role
    ```
 
-7. Edit `variants/<slug>/resume.json` conservatively:
+9. Edit the variant conservatively:
    - sharpen summary toward the role;
    - reorder skills and projects for relevance;
    - tighten bullets using JD language only when truthful;
-   - preserve the canonical work history.
-8. Write `variants/<slug>/notes.md` with:
-   - target role;
-   - keywords emphasized;
-   - exact sections changed;
-   - review risks or claims needing user confirmation.
-9. Build the variant:
+   - preserve canonical work history.
+10. Write `variants/<slug>/notes.md` with:
+    - target role;
+    - keywords emphasized;
+    - exact sections changed;
+    - review risks or claims needing user confirmation.
+11. Build and verify locally:
 
-   ```bash
-   npm run build -- --variant company-role
-   ```
+    ```bash
+    npm run build
+    npm run export:pdf
+    ```
 
-10. Publish:
-   - GitHub Pages: push `main`. The `Publish Resume Page` workflow builds the static page, deploys GitHub Pages, exports a PDF, and creates a timestamped Release.
-   - Vercel: push `jd/company-role` branch and use the preview deployment URL.
+12. If the user wants encrypted private details:
 
-11. Return URLs:
-   - Public resume: `https://<owner>.github.io/<repo>/`
-   - Private resume: `https://<owner>.github.io/<repo>/#key=<base64url-key>`
-   - PDF releases: `https://github.com/<owner>/<repo>/releases`
+    ```bash
+    npm run encrypt
+    npm run build
+    ```
+
+    Capture the printed `/#key=...` suffix for the user only.
+
+13. Browser-check the generated site:
+    - public page loads;
+    - private contact fields are redacted;
+    - `/#key=...` unlocks full contact fields when encryption is enabled;
+    - layout is readable on desktop and mobile;
+    - PDF export exists under `release/`.
+14. Ask whether to publish from `main` or another branch.
+15. Publish only after user confirmation.
+16. Return final outputs:
+    - public URL;
+    - encrypted URL with fragment key when applicable;
+    - PDF or releases URL;
+    - branch name and commit summary;
+    - notes about any claims needing user review.
 
 ## GitHub Pages Release Flow
 
@@ -88,45 +126,33 @@ When the user asks to publish through GitHub:
 4. Run local validation:
 
    ```bash
-   npm run encrypt
    npm run build
    npm run export:pdf
    ```
 
-5. Browser-check the local public page:
-   - public page shows redacted contact fields;
-   - `/#key=...` unlocks full contact fields;
-   - PDF export exists under `release/`.
-6. Commit source files plus `public/private-resume.enc.json`. The encrypted payload is safe to publish; the fragment key is not.
-7. Push `main`.
-8. Watch the `Publish Resume Page` GitHub Actions run:
+5. Commit source files plus `public/private-resume.enc.json` if encrypted mode is used. The encrypted payload is safe to publish; the fragment key is not.
+6. Push the user-approved branch.
+7. Watch the GitHub Actions run:
 
    ```bash
+   gh run list --repo <owner>/<repo> --limit 5
    gh run watch <run-id> --repo <owner>/<repo> --exit-status
    ```
 
-   Or trigger it manually after enabling Pages:
-
-   ```bash
-   gh workflow run pages.yml --repo <owner>/<repo> --ref main
-   ```
-
-9. Confirm:
+8. Confirm:
    - Pages deployment succeeded;
-   - GitHub Release was created;
+   - GitHub Release was created if the workflow ran on `main`;
    - Release contains a timestamped PDF asset;
    - public URL loads without exposing raw sensitive fields;
-   - private URL with `#key=...` unlocks full contact details.
-10. Return:
-    - `https://<owner>.github.io/<repo>/`
-    - `https://<owner>.github.io/<repo>/#key=<base64url-key>`
-    - `https://github.com/<owner>/<repo>/releases/latest`
+   - private URL with `#key=...` unlocks full contact details when applicable.
 
 ## Output Checklist
 
+- `resume.json` contains only user-supported facts.
+- `publisher.redact` protects direct contact and location details as requested.
+- The selected `design-md/*.md` is reflected in the actual page.
 - `dist/index.html` renders the public or tailored resume.
 - Contact info is hidden unless decrypted in the browser.
-- Print button works for PDF export.
+- Print/PDF export works.
 - Variant notes explain every meaningful adjustment.
-- The GitHub Release includes `resume-YYYY.MM.DD.HHMM-<short-sha>.pdf`.
-- The user receives the public URL, private encrypted URL, releases URL, and exact build/publish commands used.
+- The user receives URLs, branch information, and any private unlock key.

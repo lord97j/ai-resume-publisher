@@ -9,21 +9,23 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-1c2522.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20-43853d)](package.json)
 
-Generate, tailor, encrypt, publish, and export AI resume pages from Git branches.
+Agent-readable skill for turning a resume into a personalized, publishable website.
 
-**AI Resume Publisher** is an open-source starter for job seekers who want a Git-native personal resume homepage. It ships as a static-site template plus an AI/Codex skill: the public `main` branch hosts a redacted resume, while each job description can become a tailored branch or variant with its own preview, PDF, and review notes.
+**AI Resume Publisher is not an npm product flow for end users.** It is a Codex / Claude Code style skill plus a reference static-site implementation. A human brings a resume; an Agent reads this repo, extracts the resume into `resume.json`, chooses the most suitable `design-md/*.md` direction, edits the personal website, tests locally, and publishes with the user's consent.
 
-[Quick Start](#quick-start) • [Style Gallery](#style-gallery) • [How It Works](#how-it-works) • [Search Tools](#search-tools) • [Documentation](#documentation) • [Configuration](#configuration) • [Troubleshooting](#troubleshooting) • [License](#open-source-license)
+This repo is inspired by the positioning of [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md): markdown files give Agents design and build intent they can apply directly. Here, `SKILL.md` explains when to use the skill, `AGENTS.md` explains how to operate the repo, `design-md/` gives visual references, and the existing resume site code is only the starting point.
+
+[Agent Workflow](#agent-workflow) • [Install As A Skill](#install-as-a-skill) • [Repository Map](#repository-map) • [Design References](#design-references) • [Publishing](#publishing) • [Troubleshooting](#troubleshooting) • [License](#open-source-license)
 
 ## Demo
 
-Public resume:
+Reference public resume:
 [https://lord97j.github.io/ai-resume-publisher/](https://lord97j.github.io/ai-resume-publisher/)
 
-Encrypted full resume:
+Reference encrypted full resume:
 [https://lord97j.github.io/ai-resume-publisher/#key=farKpQkucG44mZcmLIa3Bz2jlDy9hZMxBvyRS4wXU6k](https://lord97j.github.io/ai-resume-publisher/#key=farKpQkucG44mZcmLIa3Bz2jlDy9hZMxBvyRS4wXU6k)
 
-Latest timestamped PDF:
+Latest reference PDF:
 [GitHub Releases](https://github.com/lord97j/ai-resume-publisher/releases/latest)
 
 ### Privacy States
@@ -36,71 +38,96 @@ After private unlock:
 
 ![Private resume after encrypted unlock](docs/assets/privacy-after.png)
 
-## Style Gallery
+## Agent Workflow
 
-The project includes five resume styles inspired by the local `design-md/` references copied from `awesome-design-md`.
+The intended flow is Agent-led:
 
-| Style | Best-fit roles | Branch | Build command |
-|---|---|---|---|
-| Linear | Backend, architecture, security, infrastructure | `style/linear` | `npm run build -- --style linear` |
-| Stripe | PM, growth, technical sales, SaaS full-stack | `style/stripe` | `npm run build -- --style stripe` |
-| Claude | AI research, content, market strategy, prompt engineering | `style/claude` | `npm run build -- --style claude` |
-| Notion | Operations, project management, admin, junior roles | `style/notion` | `npm run build -- --style notion` |
-| Vercel | Frontend, UI/UX engineering, startup generalists | `style/vercel` | `npm run build -- --style vercel` |
+1. User installs this repository as a skill for Codex, Claude Code, or another coding Agent.
+2. Agent verifies required tools with the user: Git, GitHub CLI, Node.js 20+, and a browser or static server for local preview.
+3. With explicit user consent, Agent creates a private GitHub repository or forks this repository into the user's account.
+4. User provides resume content as text, Markdown, PDF text, or an existing JSON file.
+5. Agent extracts canonical facts into `resume.json`. Facts must be preserved; uncertain claims go into notes, not into the resume.
+6. Agent reads `AGENTS.md`, `SKILL.md`, `resume.json`, and the best-fit `design-md/*.md` file.
+7. Agent edits the website so the content, structure, writing tone, and visual direction fit the user's actual background.
+8. Agent runs local validation and browser checks before publishing.
+9. Agent asks whether to publish from `main` or another branch.
+10. Agent publishes, then returns the public URL, private unlock URL fragment, PDF/release URL, and any encryption key material the user needs.
 
-Linear:
+The npm scripts are implementation tools for the Agent. They are not the user-facing installation or publishing experience.
 
-![Linear resume preview](docs/assets/style-previews/linear.png)
+## Install As A Skill
 
-Stripe:
-
-![Stripe resume preview](docs/assets/style-previews/stripe.png)
-
-Claude:
-
-![Claude resume preview](docs/assets/style-previews/claude.png)
-
-Notion:
-
-![Notion resume preview](docs/assets/style-previews/notion.png)
-
-Vercel:
-
-![Vercel resume preview](docs/assets/style-previews/vercel.png)
-
-## Quick Start
-
-Clone and build:
+For Codex-style local skills:
 
 ```bash
-git clone git@github.com:lord97j/ai-resume-publisher.git
-cd ai-resume-publisher
-npm run build
+mkdir -p ~/.codex/skills
+ln -s "$PWD" ~/.codex/skills/ai-resume-publisher
 ```
 
-Open `dist/index.html` or serve `dist/` with any static server.
-
-Create an encrypted full-resume payload:
+Or copy only the skill entrypoint:
 
 ```bash
-npm run encrypt
-npm run build
+mkdir -p ~/.codex/skills/ai-resume-publisher
+cp SKILL.md ~/.codex/skills/ai-resume-publisher/SKILL.md
 ```
 
-The command prints a private URL suffix:
+Then ask your Agent something like:
 
 ```txt
-/#key=<base64url-key>
+Use the AI Resume Publisher skill.
+Create a private GitHub repo for my resume site after I approve it.
+Extract my resume into resume.json, choose the right design reference,
+build the personal website, test locally, and publish when I confirm the branch.
 ```
 
-Build a tailored resume variant from a JD:
+## Repository Map
+
+| File or folder | Purpose for Agents |
+|---|---|
+| `SKILL.md` | Skill trigger, guardrails, and high-level workflow |
+| `AGENTS.md` | Operating manual for coding Agents working in this repo |
+| `resume.json` | Canonical resume data extracted from the user's source resume |
+| `design-md/` | Agent-readable design directions inspired by public website patterns |
+| `templates/minimal-html/` | Reference static resume template and CSS |
+| `scripts/build.js` | Builds `dist/index.html` from `resume.json` or a variant |
+| `scripts/encrypt.js` | Creates encrypted private resume payload and prints URL fragment key |
+| `scripts/export-pdf.js` | Exports a timestamped PDF from the built static site |
+| `scripts/tailor.js` | Creates a reviewable JD-specific variant scaffold |
+| `variants/<slug>/` | Optional role or company-specific resume variants |
+| `.github/workflows/pages.yml` | Reference GitHub Pages and PDF release workflow |
+
+## Design References
+
+The local `design-md/` files are copied from, or modeled after, the public [awesome-design-md](https://github.com/VoltAgent/awesome-design-md) concept: plain Markdown design files that Agents can read and apply.
+
+| Style | Best-fit resume signal | Local file | Build hint |
+|---|---|---|---|
+| Linear | Backend, architecture, security, infrastructure | `design-md/linear.md` | `npm run build -- --style linear` |
+| Stripe | PM, growth, technical sales, SaaS full-stack | `design-md/stripe.md` | `npm run build -- --style stripe` |
+| Claude | AI research, content, market strategy, prompt engineering | `design-md/claude.md` | `npm run build -- --style claude` |
+| Notion | Operations, project management, admin, junior roles | `design-md/notion.md` | `npm run build -- --style notion` |
+| Vercel | Frontend, UI/UX engineering, startup generalists | `design-md/vercel.md` | `npm run build -- --style vercel` |
+
+The Agent may choose one of these directly or combine the resume content with a custom implementation when that better serves the user's background. The goal is a convincing personal site, not brand imitation.
+
+## Local Agent Commands
+
+Use these after the resume has been normalized:
+
+```bash
+npm run build
+npm run encrypt
+npm run export:pdf
+```
+
+Build a role-specific variant:
 
 ```bash
 npm run tailor -- --jd examples/frontend-jd.md --slug acme-frontend
 npm run build -- --variant acme-frontend
 ```
 
-Build with a specific visual style:
+Build with a specific visual direction:
 
 ```bash
 npm run build -- --style linear
@@ -110,160 +137,24 @@ npm run build -- --style notion
 npm run build -- --style vercel
 ```
 
-Recommend a style from a role:
+Recommend a style from a role description:
 
 ```bash
 node scripts/recommend-style.js --role "backend architect"
 node scripts/recommend-style.js --role "AI research"
 ```
 
-Export a timestamped PDF:
+## Publishing
 
-```bash
-npm run export:pdf
-```
+When the user approves GitHub publishing, the Agent should:
 
-The PDF is written to `release/resume-<version>.pdf`.
-
-## Skill Installation
-
-Install the skill locally for Codex-style agents:
-
-```bash
-mkdir -p ~/.codex/skills/ai-resume-publisher
-cp SKILL.md ~/.codex/skills/ai-resume-publisher/SKILL.md
-```
-
-For active development, symlink the project instead:
-
-```bash
-mkdir -p ~/.codex/skills
-ln -s "$PWD" ~/.codex/skills/ai-resume-publisher
-```
-
-Then ask your agent:
-
-```txt
-Use the AI Resume Publisher skill.
-Read my resume draft, generate resume.json, publish the public page,
-then tailor a private branch for this JD.
-```
-
-## How It Works
-
-![AI Resume Publisher workflow](docs/assets/workflow.png)
-
-Core ideas:
-
-- `main` is the public resume homepage.
-- Sensitive fields are redacted before publishing.
-- Full resume data is stored as AES-GCM ciphertext.
-- The decryption key lives in the URL fragment, so it is not sent to GitHub Pages.
-- JD-specific versions live in `variants/<company-role>/` or Git branches.
-- GitHub Actions publishes Pages and attaches PDFs to timestamped Releases.
-
-## Search Tools
-
-This project is designed for agent-friendly discovery. The skill should inspect these files first:
-
-| Surface | Purpose |
-|---|---|
-| `resume.json` | Canonical resume data |
-| `publisher.redact` | Public redaction policy |
-| `variants/<slug>/resume.json` | JD-specific resume variant |
-| `variants/<slug>/jd.md` | Original target JD |
-| `variants/<slug>/notes.md` | What changed and what needs review |
-| `public/private-resume.enc.json` | Public ciphertext for private unlock |
-| `release/resume-*.pdf` | Local PDF export artifacts |
-| GitHub Releases | Published PDF history by time and commit |
-
-Useful commands:
-
-```bash
-rg "publisher|redact|variant" resume.json variants
-gh release list --repo <owner>/<repo> --limit 10
-gh run list --repo <owner>/<repo> --limit 5
-gh api repos/<owner>/<repo>/pages
-```
-
-## Documentation
-
-| Topic | File / Command |
-|---|---|
-| Skill workflow | [`SKILL.md`](SKILL.md) |
-| Chinese documentation | [`README.zh-CN.md`](README.zh-CN.md) |
-| Resume schema sample | [`resume.json`](resume.json) |
-| Style design references | [`design-md/`](design-md/README.md) |
-| Static builder | [`scripts/build.js`](scripts/build.js) |
-| Style recommender | [`scripts/recommend-style.js`](scripts/recommend-style.js) |
-| JD variant generator | [`scripts/tailor.js`](scripts/tailor.js) |
-| Redaction helpers | [`scripts/redact.js`](scripts/redact.js) |
-| Encryption | [`scripts/encrypt.js`](scripts/encrypt.js) |
-| PDF export | [`scripts/export-pdf.js`](scripts/export-pdf.js) |
-| GitHub Pages workflow | [`.github/workflows/pages.yml`](.github/workflows/pages.yml) |
-
-## Configuration
-
-### Resume Data
-
-Edit `resume.json`. The shape is compatible with the spirit of JSON Resume and adds a `publisher` block:
-
-```json
-{
-  "publisher": {
-    "redact": ["email", "phone", "location"],
-    "template": "linear",
-    "tone": "credible, concise, evidence-first"
-  }
-}
-```
-
-Supported `publisher.template` values:
-
-```txt
-minimal-html
-linear
-stripe
-claude
-notion
-vercel
-```
-
-### Redaction
-
-Use `publisher.redact` to decide which fields are hidden on the public page. The default public homepage hides direct contact fields and keeps public profile links visible.
-
-### Encryption
-
-Run:
-
-```bash
-npm run encrypt
-```
-
-Commit `public/private-resume.enc.json`; do **not** commit or paste the printed `#key=...` into issues, PRs, README examples for real resumes, or public logs.
-
-### GitHub Pages and Releases
-
-Enable Pages in workflow mode:
-
-```bash
-gh api -X POST repos/<owner>/<repo>/pages \
-  -f build_type=workflow \
-  -f 'source[branch]=main' \
-  -f 'source[path]=/'
-```
-
-Push `main`. The workflow will:
-
-1. build `dist/`;
-2. export `resume-YYYY.MM.DD.HHMM-<short-sha>.pdf`;
-3. upload the PDF to a GitHub Release;
-4. deploy GitHub Pages.
-
-## Output Results
-
-After a successful publish, you should have:
+1. Confirm repository ownership and privacy settings.
+2. Confirm whether publication should happen from `main` or a separate branch.
+3. Run local validation.
+4. Keep the printed `#key=...` out of commits, issues, PR descriptions, and public logs.
+5. Push the approved branch.
+6. Verify GitHub Pages, GitHub Actions, and releases.
+7. Return:
 
 ```txt
 Public URL:
@@ -279,7 +170,7 @@ Latest PDF:
 https://github.com/<owner>/<repo>/releases/latest
 ```
 
-For this repository:
+For this reference repository:
 
 - Public URL: [https://lord97j.github.io/ai-resume-publisher/](https://lord97j.github.io/ai-resume-publisher/)
 - Latest PDF: [https://github.com/lord97j/ai-resume-publisher/releases/latest](https://github.com/lord97j/ai-resume-publisher/releases/latest)
@@ -288,20 +179,13 @@ For this repository:
 
 | Problem | Fix |
 |---|---|
+| Agent treats this as an npm package | Read `SKILL.md` and `AGENTS.md`; npm scripts are internal build helpers |
 | `Get Pages site failed` | Enable Pages with `gh api -X POST repos/<owner>/<repo>/pages -f build_type=workflow ...` |
 | Pages returns `404` | Wait for the workflow to finish, then check `gh api repos/<owner>/<repo>/pages` |
 | Private unlock fails | Make sure `public/private-resume.enc.json` matches the printed `#key=...` from the same `npm run encrypt` run |
 | PDF export cannot find Chrome | Set `CHROME_BIN=/path/to/chrome` and rerun `npm run export:pdf` |
 | Release was not created | Check `gh run view <run-id> --log-failed` and repository `contents: write` workflow permission |
 | Public page shows private data | Review `publisher.redact`, rerun `npm run build`, and inspect `dist/index.html` before publishing |
-
-## Roadmap
-
-- More templates for engineers, product managers, researchers, designers, and students.
-- Stronger JD tailoring reports with keyword coverage.
-- Branch-based Vercel preview helpers.
-- Bilingual resume output.
-- Optional ATS-friendly plain HTML mode.
 
 ## Open Source License
 

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Generate, tailor, publish, and export AI resume pages from Git branches.",
+  "description": "Agent skill and reference implementation for personalized resume websites.",
   "scripts": {
     "build": "node scripts/build.js",
     "tailor": "node scripts/tailor.js",
@@ -18,7 +18,9 @@
     "github-pages",
     "vercel",
     "json-resume",
-    "codex-skill"
+    "codex-skill",
+    "agent-skill",
+    "design-md"
   ],
   "license": "MIT",
   "engines": {

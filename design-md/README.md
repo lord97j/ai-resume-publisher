@@ -1,8 +1,8 @@
-# Resume Style DESIGN.md References
+# Resume Style Design References
 
-These files are copied from the public [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md) collection so AI agents can build resume templates with consistent visual language.
+These files are copied from, or modeled after, the public [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md) collection so AI agents can build resume websites with consistent visual language.
 
-They are inspiration/reference material, not official brand design systems. The upstream project describes them as independent analyses of publicly observable design patterns.
+They are inspiration/reference material, not official brand design systems. The upstream project describes `DESIGN.md` as a plain Markdown design system document that agents can read directly. In this repository, the files help an Agent choose a suitable resume-site direction for the user's actual background.
 
 | Local file | Upstream source | Resume use |
 |---|---|---|
@@ -11,5 +11,7 @@ They are inspiration/reference material, not official brand design systems. The 
 | `claude.md` | `design-md/claude/DESIGN.md` | AI research, content strategy, prompt engineering |
 | `notion.md` | `design-md/notion/DESIGN.md` | Operations, project management, admin, junior roles |
 | `vercel.md` | `design-md/vercel/DESIGN.md` | Frontend, UI/UX engineering, startup generalists |
+
+Agents should apply these files as design intent, not as brand clones. The final site should fit the user's resume content first.
 
 Upstream license: MIT. See the upstream repository for the full license and disclaimer.
