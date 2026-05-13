@@ -37,7 +37,6 @@ jobs:
           SHORT_SHA="${GITHUB_SHA::7}"
           echo "RESUME_VERSION=${VERSION}-${SHORT_SHA}" >> "$GITHUB_ENV"
           npm run export:pdf -- --version "${VERSION}-${SHORT_SHA}"
-          cp "release/resume-${VERSION}-${SHORT_SHA}.pdf" dist/resume.pdf
           touch dist/.nojekyll
       - name: Resolve deploy target
         id: target
@@ -103,9 +102,9 @@ jobs:
           echo "Main resume: ${BASE_URL}"
           if [[ "${{ steps.target.outputs.is_jd }}" == "true" ]]; then
             echo "JD resume: ${BASE_URL}${{ steps.target.outputs.target_folder }}/"
-            echo "JD PDF: ${BASE_URL}${{ steps.target.outputs.target_folder }}/resume.pdf"
+            echo "PDF release: https://github.com/${GITHUB_REPOSITORY}/releases/latest"
           else
-            echo "Main PDF: ${BASE_URL}resume.pdf"
+            echo "PDF release: https://github.com/${GITHUB_REPOSITORY}/releases/latest"
           fi
 
   deploy-pages:

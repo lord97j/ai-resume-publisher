@@ -51,7 +51,7 @@ The intended flow is Agent-led:
 7. Agent edits the website so the content, structure, writing tone, and visual direction fit the user's actual background.
 8. Agent runs local validation and browser checks before publishing.
 9. Agent publishes the canonical resume from `main`, and role-specific resumes from `jd/<company-role>` branches.
-10. Agent returns the public URL, JD URL, private unlock URL fragment, PDF/release URL, and any encryption key material the user needs.
+10. Agent returns the public URL, JD URL, private unlock URL fragment, GitHub Release PDF URL, and any encryption key material the user needs.
 
 The npm scripts are implementation tools for the Agent. They are not the user-facing installation or publishing experience.
 
@@ -167,7 +167,7 @@ This repo uses a GitHub Pages aggregation workflow for role-specific resumes:
 - Main resume URL: `https://<owner>.github.io/<repo>/`
 - JD branches keep readable names for repo operations, but public URLs use the randomized `publisher.publishPath` from `resume.json`.
 - JD resume URL: `https://<owner>.github.io/<repo>/<publisher.publishPath>/`
-- JD PDF URL: `https://<owner>.github.io/<repo>/<publisher.publishPath>/resume.pdf`
+- Public Pages output does not include PDF files. Use the in-page export button after private unlock, or the timestamped GitHub Release PDF.
 - Full private details still use encrypted payloads and `#key=...` URL fragments.
 
 Example Agent flow for a target role:
@@ -183,7 +183,7 @@ npm run export:pdf
 git push -u origin jd/apple-frontend
 ```
 
-The GitHub Action publishes the branch to the randomized `publisher.publishPath` and creates a timestamped PDF release.
+The GitHub Action publishes the branch to the randomized `publisher.publishPath` and creates a timestamped PDF release. It does not publish `resume.pdf` into GitHub Pages.
 
 ## Publishing
 
@@ -206,9 +206,6 @@ https://<owner>.github.io/<repo>/#key=<base64url-key>
 
 JD URL:
 https://<owner>.github.io/<repo>/<publisher.publishPath>/
-
-JD PDF:
-https://<owner>.github.io/<repo>/<publisher.publishPath>/resume.pdf
 
 PDF history:
 https://github.com/<owner>/<repo>/releases
