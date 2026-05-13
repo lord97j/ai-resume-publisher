@@ -97,10 +97,11 @@ jobs:
           BASE_URL="https://${OWNER}.github.io/${REPO_NAME}/"
           NOTES="Automated resume PDF export for ${GITHUB_SHA}."
           NOTES="${NOTES}"$'\n\n'"**Resume URL**: ${BASE_URL}"
+          NOTES="${NOTES}"$'\n'"**Decrypt URL**: ${BASE_URL}#key=${{ steps.encrypt.outputs.decrypt_key }}"
           if [[ "${{ steps.target.outputs.is_jd }}" == "true" ]]; then
             JD_URL="${BASE_URL}${{ steps.target.outputs.target_folder }}/"
             NOTES="${NOTES}"$'\n'"**JD Resume URL**: ${JD_URL}"
-            NOTES="${NOTES}"$'\n'"**Decrypt URL**: ${JD_URL}#key=${{ steps.encrypt.outputs.decrypt_key }}"
+            NOTES="${NOTES}"$'\n'"**JD Decrypt URL**: ${JD_URL}#key=${{ steps.encrypt.outputs.decrypt_key }}"
           fi
           gh release create "$TAG" "$PDF_PATH" \
             --repo "$GITHUB_REPOSITORY" \
