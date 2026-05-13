@@ -25,8 +25,11 @@ await writeFile(
   )
 );
 
+const keyB64 = base64url(key);
+await writeFile(path.join(root, "public", "decrypt.key"), keyB64);
+
 console.log("Encrypted full resume written to public/private-resume.enc.json");
-console.log(`Private URL suffix: /#key=${base64url(key)}`);
+console.log(`Private URL suffix: /#key=${keyB64}`);
 
 function base64url(buffer) {
   return Buffer.from(buffer).toString("base64url");

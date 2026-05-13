@@ -27,13 +27,18 @@ jobs:
           node-version: 20
       - uses: browser-actions/setup-chrome@v1
         id: setup-chrome
-      - name: Encrypt private resume
+      - name: Encrypt private resume (JD branch only)
+        if: startsWith(github.ref_name, 'jd/')
         id: encrypt
         run: |
           ENCRYPT_OUTPUT="$(npm run encrypt 2>&1)"
           echo "$ENCRYPT_OUTPUT"
           KEY="$(echo "$ENCRYPT_OUTPUT" | grep -oP 'key=\K[A-Za-z0-9_-]+')"
           echo "decrypt_key=${KEY}" >> "$GITHUB_OUTPUT"
+      - name: Read decrypt key (main branch)
+        if: "!startsWith(github.ref_name, 'jd/')"
+        id: encrypt
+        run: echo "decrypt_key=$(cat public/decrypt.key)" >> "$GITHUB_OUTPUT"
       - name: Build static resume
         run: npm run build
       - name: Export timestamped PDF
