@@ -2,7 +2,7 @@
   "basics": {
     "name": "Alex Chen",
     "label": "Frontend Engineer",
-    "summary": "Frontend engineer focused on AI-assisted productivity tools, design systems, and reliable web delivery. Target emphasis: React, TypeScript, CSS, Accessibility, Performance.",
+    "summary": "Frontend engineer focused on AI-assisted productivity tools, design systems, and reliable web delivery.",
     "email": "alex@example.com",
     "phone": "+1 555 010 2030",
     "location": {
@@ -119,6 +119,7 @@
       "Mark uncertain edits in variant notes for human review."
     ],
     "variant": "acme-frontend",
+    "publishPath": "p/7f4d8a12c9e3b601",
     "emphasizedKeywords": [
       "React",
       "TypeScript",

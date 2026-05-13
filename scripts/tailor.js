@@ -1,4 +1,5 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import crypto from "node:crypto";
 import path from "node:path";
 
 const root = process.cwd();
@@ -71,13 +72,10 @@ function scaffoldVariant(resume, slug, keywords) {
   clone.publisher = {
     ...(clone.publisher || {}),
     variant: slug,
+    publishPath: clone.publisher?.publishPath || randomPublishPath(),
     emphasizedKeywords: keywords,
     reviewRequired: true
   };
-
-  if (clone.basics?.summary && keywords.length) {
-    clone.basics.summary = `${clone.basics.summary} Target emphasis: ${keywords.slice(0, 5).join(", ")}.`;
-  }
 
   clone.skills = prioritizeByKeywords(clone.skills || [], keywords, (skill) => [skill.name, ...(skill.keywords || [])].join(" "));
   clone.projects = prioritizeByKeywords(clone.projects || [], keywords, (project) => [project.name, project.description, ...(project.keywords || [])].join(" "));
@@ -97,6 +95,11 @@ function score(item, keywords, textForItem) {
 function renderNotes(slug, keywords) {
   return `# Variant Notes: ${slug}
 
+## Private Publish Path
+
+- This variant should publish to the randomized path stored in \`resume.json -> publisher.publishPath\`.
+- Keep the branch name descriptive for repository operations, but share only the randomized public URL with employers.
+
 ## Target Keywords
 
 ${keywords.length ? keywords.map((keyword) => `- ${keyword}`).join("\n") : "- No obvious known keywords detected. Review the JD manually."}
@@ -105,12 +108,16 @@ ${keywords.length ? keywords.map((keyword) => `- ${keyword}`).join("\n") : "- No
 
 - Created a branch-ready resume variant from the canonical resume.
 - Reordered skills and projects when they matched JD keywords.
-- Added a summary emphasis sentence for human review.
+- Preserved the public-facing summary so the page does not reveal JD tailoring.
 
 ## Human Review Required
 
-- Replace the mechanical summary emphasis with natural language.
+- Rewrite summary and highlights naturally if stronger positioning is needed.
 - Confirm every bullet remains factual.
 - Add only metrics the candidate can defend.
 `;
+}
+
+function randomPublishPath() {
+  return `p/${crypto.randomBytes(8).toString("hex")}`;
 }

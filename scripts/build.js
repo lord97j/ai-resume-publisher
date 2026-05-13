@@ -52,7 +52,6 @@ function normalizeStyle(value) {
 function renderPage(resume, options) {
   const basics = resume.basics || {};
   const title = `${basics.name || "Resume"}${basics.label ? ` - ${basics.label}` : ""}`;
-  const variantLabel = options.variant || resume.publisher?.variant;
 
   return `<!doctype html>
 <html lang="en">
@@ -67,7 +66,6 @@ function renderPage(resume, options) {
   <main class="page">
     <header class="resume-header">
       <div>
-        <p class="eyebrow">${escapeHtml([styleLabel(options.style), variantLabel ? `Tailored resume: ${variantLabel}` : "Public resume"].join(" / "))}</p>
         <h1>${escapeHtml(basics.name || "Your Name")}</h1>
         <p class="role">${escapeHtml(basics.label || "")}</p>
       </div>
@@ -91,18 +89,6 @@ function renderPage(resume, options) {
   ${options.hasEncryptedResume ? renderUnlockScript() : ""}
 </body>
 </html>`;
-}
-
-function styleLabel(styleName) {
-  const labels = {
-    "minimal-html": "Minimal",
-    linear: "Linear",
-    stripe: "Stripe",
-    claude: "Claude",
-    notion: "Notion",
-    vercel: "Vercel"
-  };
-  return labels[styleName] || labels["minimal-html"];
 }
 
 function renderContact(resume) {

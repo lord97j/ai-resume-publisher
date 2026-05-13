@@ -54,6 +54,7 @@ try {
     "--run-all-compositor-stages-before-draw",
     `--print-to-pdf=${pdfPath}`,
     "--print-to-pdf-no-header",
+    "--no-pdf-header-footer",
     url
   ]);
   console.log(`Exported PDF to ${pdfPath}`);

@@ -46,6 +46,7 @@ This repository is an Agent skill plus a reference resume-site implementation. Y
 - Avoid making the page look like a generic SaaS landing page when the user's goal is a resume or personal site.
 - If creating JD-specific versions for local review, keep them under `variants/<slug>/` and explain changes in `notes.md`.
 - If creating a publishable JD-specific resume, use a `jd/<slug>` branch and keep the optimized resume in the branch root `resume.json`.
+- Do not expose JD tailoring in public UI, PDF text, or shared URLs. Branch names can be descriptive; public paths should come from randomized `publisher.publishPath`.
 
 ## Local Validation
 
@@ -115,8 +116,8 @@ git push -u origin jd/company-role
 The workflow deploys:
 
 - `main` to `https://<owner>.github.io/<repo>/`
-- `jd/company-role` to `https://<owner>.github.io/<repo>/jd/company-role/`
-- branch PDF to `https://<owner>.github.io/<repo>/jd/company-role/resume.pdf`
+- `jd/company-role` to `https://<owner>.github.io/<repo>/<publisher.publishPath>/`
+- branch PDF to `https://<owner>.github.io/<repo>/<publisher.publishPath>/resume.pdf`
 
 GitHub Pages cannot password-protect different subdirectories. Use encrypted resume payloads and `#key=...` fragments for private contact details.
 
