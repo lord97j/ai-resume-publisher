@@ -1,0 +1,135 @@
+{
+  "basics": {
+    "name": "Alex Chen",
+    "label": "Frontend Engineer",
+    "summary": "Frontend engineer focused on AI-assisted productivity tools, design systems, and reliable web delivery. Target emphasis: React, TypeScript, CSS, Accessibility, Performance.",
+    "email": "alex@example.com",
+    "phone": "+1 555 010 2030",
+    "location": {
+      "city": "San Francisco",
+      "region": "CA",
+      "countryCode": "US"
+    },
+    "profiles": [
+      {
+        "network": "GitHub",
+        "username": "alexchen",
+        "url": "https://github.com/alexchen"
+      },
+      {
+        "network": "LinkedIn",
+        "username": "alexchen",
+        "url": "https://www.linkedin.com/in/alexchen"
+      }
+    ]
+  },
+  "work": [
+    {
+      "name": "Orbit Apps",
+      "position": "Senior Frontend Engineer",
+      "startDate": "2023-01",
+      "endDate": "Present",
+      "summary": "Led frontend delivery for a multi-tenant analytics workspace.",
+      "highlights": [
+        "Built a reusable dashboard framework that reduced new analytics page delivery time by 40%.",
+        "Introduced component contracts and visual regression checks across the design system.",
+        "Partnered with product and data teams to ship AI-assisted report generation."
+      ]
+    },
+    {
+      "name": "Northstar Labs",
+      "position": "Frontend Engineer",
+      "startDate": "2020-06",
+      "endDate": "2022-12",
+      "summary": "Built collaboration features for a B2B SaaS product.",
+      "highlights": [
+        "Improved application startup performance by 32% through route-level code splitting.",
+        "Created a typed API client shared by three product teams.",
+        "Maintained accessibility standards for core task flows."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "AI Resume Publisher",
+      "description": "Git-native static resume system with redaction, encrypted private views, and JD-specific variants.",
+      "highlights": [
+        "Designed a JSON Resume compatible data model.",
+        "Built static publishing flow for GitHub Pages and Vercel previews."
+      ],
+      "keywords": [
+        "AI",
+        "Static Site",
+        "GitHub Pages",
+        "Vercel"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "name": "Frontend",
+      "keywords": [
+        "TypeScript",
+        "React",
+        "Astro",
+        "Vite",
+        "CSS",
+        "Accessibility"
+      ]
+    },
+    {
+      "name": "Delivery",
+      "keywords": [
+        "GitHub Actions",
+        "Vercel",
+        "Testing",
+        "Performance"
+      ]
+    },
+    {
+      "name": "AI Product",
+      "keywords": [
+        "Prompting",
+        "Evaluation",
+        "Workflow Automation",
+        "OpenAI API"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Example University",
+      "area": "Computer Science",
+      "studyType": "B.S.",
+      "startDate": "2016",
+      "endDate": "2020"
+    }
+  ],
+  "publisher": {
+    "redact": [
+      "email",
+      "phone",
+      "location"
+    ],
+    "template": "minimal-html",
+    "tone": "credible, concise, evidence-first",
+    "guardrails": [
+      "Do not invent employers, dates, titles, degrees, metrics, or certifications.",
+      "Prefer reordering and tightening over rewriting facts.",
+      "Mark uncertain edits in variant notes for human review."
+    ],
+    "variant": "acme-frontend",
+    "emphasizedKeywords": [
+      "React",
+      "TypeScript",
+      "CSS",
+      "Accessibility",
+      "Performance",
+      "Vercel",
+      "GitHub Actions",
+      "AI",
+      "Product"
+    ],
+    "reviewRequired": true
+  }
+}

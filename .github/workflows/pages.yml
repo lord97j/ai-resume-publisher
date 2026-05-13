@@ -1,0 +1,78 @@
+name: Publish Resume Page
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  actions: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: browser-actions/setup-chrome@v1
+        id: setup-chrome
+      - name: Build static resume
+        run: npm run build
+      - name: Export timestamped PDF
+        env:
+          CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: |
+          VERSION="$(date -u +'%Y.%m.%d.%H%M')"
+          SHORT_SHA="${GITHUB_SHA::7}"
+          echo "RESUME_VERSION=${VERSION}-${SHORT_SHA}" >> "$GITHUB_ENV"
+          npm run export:pdf -- --version "${VERSION}-${SHORT_SHA}"
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Create release with PDF
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PDF_PATH="$(ls release/resume-*.pdf | head -n 1)"
+          TAG="resume-${RESUME_VERSION}"
+          gh release create "$TAG" "$PDF_PATH" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Resume ${RESUME_VERSION}" \
+            --notes "Automated resume PDF export for ${GITHUB_SHA}."
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  report:
+    runs-on: ubuntu-latest
+    needs: publish
+    if: always()
+    steps:
+      - name: Print result
+        run: echo "Published resume workflow completed with ${{ needs.publish.result }}."
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

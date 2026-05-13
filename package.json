@@ -1,0 +1,26 @@
+{
+  "name": "ai-resume-publisher",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Generate, tailor, publish, and export AI resume pages from Git branches.",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "tailor": "node scripts/tailor.js",
+    "encrypt": "node scripts/encrypt.js",
+    "export:pdf": "node scripts/export-pdf.js",
+    "clean": "node scripts/clean.js"
+  },
+  "keywords": [
+    "resume",
+    "ai",
+    "github-pages",
+    "vercel",
+    "json-resume",
+    "codex-skill"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  }
+}
