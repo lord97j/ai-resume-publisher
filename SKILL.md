@@ -143,7 +143,7 @@ When the user asks to publish through GitHub:
 5. Commit source files plus `public/private-resume.enc.json` if encrypted mode is used. The encrypted payload is safe to publish; the fragment key is not.
 6. Push the user-approved branch:
    - `main` publishes to `/`;
-   - `jd/<slug>` publishes to `/jd/<slug>/`.
+   - `jd/<slug>` publishes to the randomized `publisher.publishPath` from `resume.json`.
 7. Watch the GitHub Actions run:
 
    ```bash
@@ -153,7 +153,7 @@ When the user asks to publish through GitHub:
 
 8. Confirm:
    - Pages deployment succeeded;
-   - `gh-pages` contains root files for `main` or `jd/<slug>/` files for the JD branch;
+   - `gh-pages` contains root files for `main` or the randomized `publisher.publishPath` files for the JD branch;
    - GitHub Release was created with a timestamped PDF asset;
    - public URL loads without exposing raw sensitive fields;
    - private URL with `#key=...` unlocks full contact details when applicable.
@@ -167,5 +167,5 @@ When the user asks to publish through GitHub:
 - Contact info is hidden unless decrypted in the browser.
 - Print/PDF export works.
 - Variant notes explain every meaningful adjustment.
-- For JD branches, `https://<owner>.github.io/<repo>/jd/<slug>/` and `resume.pdf` load.
+- For JD branches, `https://<owner>.github.io/<repo>/<publisher.publishPath>/` and `resume.pdf` load.
 - The user receives URLs, branch information, and any private unlock key.

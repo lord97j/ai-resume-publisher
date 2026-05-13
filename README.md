@@ -165,8 +165,9 @@ This repo uses a GitHub Pages aggregation workflow for role-specific resumes:
 - `jd/<slug>` branches are job-specific resumes derived from the main resume.
 - The workflow builds each pushed branch and deploys it to one `gh-pages` publishing branch.
 - Main resume URL: `https://<owner>.github.io/<repo>/`
-- JD resume URL: `https://<owner>.github.io/<repo>/jd/<slug>/`
-- JD PDF URL: `https://<owner>.github.io/<repo>/jd/<slug>/resume.pdf`
+- JD branches keep readable names for repo operations, but public URLs use the randomized `publisher.publishPath` from `resume.json`.
+- JD resume URL: `https://<owner>.github.io/<repo>/<publisher.publishPath>/`
+- JD PDF URL: `https://<owner>.github.io/<repo>/<publisher.publishPath>/resume.pdf`
 - Full private details still use encrypted payloads and `#key=...` URL fragments.
 
 Example Agent flow for a target role:
@@ -182,7 +183,7 @@ npm run export:pdf
 git push -u origin jd/apple-frontend
 ```
 
-The GitHub Action publishes the branch to `/jd/apple-frontend/` and creates a timestamped PDF release.
+The GitHub Action publishes the branch to the randomized `publisher.publishPath` and creates a timestamped PDF release.
 
 ## Publishing
 
@@ -204,10 +205,10 @@ Encrypted URL:
 https://<owner>.github.io/<repo>/#key=<base64url-key>
 
 JD URL:
-https://<owner>.github.io/<repo>/jd/<slug>/
+https://<owner>.github.io/<repo>/<publisher.publishPath>/
 
 JD PDF:
-https://<owner>.github.io/<repo>/jd/<slug>/resume.pdf
+https://<owner>.github.io/<repo>/<publisher.publishPath>/resume.pdf
 
 PDF history:
 https://github.com/<owner>/<repo>/releases
@@ -228,7 +229,7 @@ For this reference repository:
 | Agent treats this as an npm package | Read `SKILL.md` and `AGENTS.md`; npm scripts are internal build helpers |
 | `Get Pages site failed` | The workflow configures Pages to publish from `gh-pages`; check token `pages: write` permission |
 | Pages returns `404` | Wait for the workflow to finish, then check `gh api repos/<owner>/<repo>/pages` |
-| JD branch is not visible | Make sure the branch name starts with `jd/` and check `https://<owner>.github.io/<repo>/jd/<slug>/` |
+| JD branch is not visible | Make sure the branch name starts with `jd/`, then check the randomized path in `resume.json -> publisher.publishPath` |
 | Private unlock fails | Make sure `public/private-resume.enc.json` matches the printed `#key=...` from the same `npm run encrypt` run |
 | PDF export cannot find Chrome | Set `CHROME_BIN=/path/to/chrome` and rerun `npm run export:pdf` |
 | Release was not created | Check `gh run view <run-id> --log-failed` and repository `contents: write` workflow permission |

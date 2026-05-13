@@ -165,8 +165,9 @@ node scripts/recommend-style.js --role "AI 研究"
 - `jd/<slug>` 分支是从主简历派生的岗位定制简历。
 - workflow 会构建每个推送的分支，并把结果部署到统一的 `gh-pages` 发布分支。
 - 主简历地址：`https://<owner>.github.io/<repo>/`
-- JD 简历地址：`https://<owner>.github.io/<repo>/jd/<slug>/`
-- JD PDF 地址：`https://<owner>.github.io/<repo>/jd/<slug>/resume.pdf`
+- JD 分支名保留可读信息，方便仓库管理；公开 URL 使用 `resume.json -> publisher.publishPath` 中的随机路径。
+- JD 简历地址：`https://<owner>.github.io/<repo>/<publisher.publishPath>/`
+- JD PDF 地址：`https://<owner>.github.io/<repo>/<publisher.publishPath>/resume.pdf`
 - 完整私密信息仍然通过加密密文和 `#key=...` URL fragment 解锁。
 
 面向目标岗位的 Agent 流程示例：
@@ -182,7 +183,7 @@ npm run export:pdf
 git push -u origin jd/apple-frontend
 ```
 
-GitHub Action 会把该分支发布到 `/jd/apple-frontend/`，并创建带时间版本的 PDF Release。
+GitHub Action 会把该分支发布到随机的 `publisher.publishPath`，并创建带时间版本的 PDF Release。
 
 ## 发布
 
@@ -204,10 +205,10 @@ https://<owner>.github.io/<repo>/
 https://<owner>.github.io/<repo>/#key=<base64url-key>
 
 JD 简历：
-https://<owner>.github.io/<repo>/jd/<slug>/
+https://<owner>.github.io/<repo>/<publisher.publishPath>/
 
 JD PDF：
-https://<owner>.github.io/<repo>/jd/<slug>/resume.pdf
+https://<owner>.github.io/<repo>/<publisher.publishPath>/resume.pdf
 
 PDF 历史版本：
 https://github.com/<owner>/<repo>/releases
@@ -228,7 +229,7 @@ https://github.com/<owner>/<repo>/releases/latest
 | Agent 把本仓库当成 npm 包 | 先读 `SKILL.md` 和 `AGENTS.md`；npm scripts 只是内部构建辅助 |
 | `Get Pages site failed` | workflow 会配置 Pages 从 `gh-pages` 发布；检查 token 是否有 `pages: write` 权限 |
 | Pages 返回 `404` | 等 workflow 完成后，运行 `gh api repos/<owner>/<repo>/pages` |
-| JD 分支访问不到 | 确认分支名以 `jd/` 开头，并访问 `https://<owner>.github.io/<repo>/jd/<slug>/` |
+| JD 分支访问不到 | 确认分支名以 `jd/` 开头，再检查 `resume.json -> publisher.publishPath` 中的随机路径 |
 | 私密解锁失败 | 确认 `public/private-resume.enc.json` 和 `#key=...` 来自同一次 `npm run encrypt` |
 | PDF 导出找不到 Chrome | 设置 `CHROME_BIN=/path/to/chrome` 后重试 `npm run export:pdf` |
 | Release 没生成 | 用 `gh run view <run-id> --log-failed` 查看日志，并检查 workflow `contents: write` 权限 |

@@ -49,9 +49,14 @@ jobs:
           if [[ "$REF_NAME" == jd/* ]]; then
             JD_SLUG="${REF_NAME#jd/}"
             JD_SLUG="$(printf '%s' "$JD_SLUG" | tr '/[:upper:]' '-[:lower:]' | sed 's/[^a-z0-9-]/-/g; s/--*/-/g; s/^-//; s/-$//')"
+            PUBLIC_PATH="$(node -e "const fs = require('fs'); const resume = JSON.parse(fs.readFileSync('resume.json', 'utf8')); process.stdout.write(resume.publisher?.publishPath || '')")"
+            PUBLIC_PATH="$(printf '%s' "$PUBLIC_PATH" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9/_-]#-#g; s#//*#/#g; s#^/##; s#/$##')"
+            if [[ -z "$PUBLIC_PATH" ]]; then
+              PUBLIC_PATH="jd/${JD_SLUG}"
+            fi
             echo "is_jd=true" >> "$GITHUB_OUTPUT"
             echo "jd_slug=${JD_SLUG}" >> "$GITHUB_OUTPUT"
-            echo "target_folder=jd/${JD_SLUG}" >> "$GITHUB_OUTPUT"
+            echo "target_folder=${PUBLIC_PATH}" >> "$GITHUB_OUTPUT"
           else
             echo "is_jd=false" >> "$GITHUB_OUTPUT"
             echo "jd_slug=" >> "$GITHUB_OUTPUT"
