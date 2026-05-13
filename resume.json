@@ -2,7 +2,7 @@
   "basics": {
     "name": "Alex Chen",
     "label": "Frontend Engineer",
-    "summary": "Frontend engineer focused on AI-assisted productivity tools, design systems, and reliable web delivery.",
+    "summary": "Frontend engineer focused on AI-assisted productivity tools, design systems, and reliable web delivery. Target emphasis: React, TypeScript, CSS, Accessibility, Performance.",
     "email": "alex@example.com",
     "phone": "+1 555 010 2030",
     "location": {
@@ -57,21 +57,43 @@
         "Designed a JSON Resume compatible data model.",
         "Built static publishing flow for GitHub Pages and Vercel previews."
       ],
-      "keywords": ["AI", "Static Site", "GitHub Pages", "Vercel"]
+      "keywords": [
+        "AI",
+        "Static Site",
+        "GitHub Pages",
+        "Vercel"
+      ]
     }
   ],
   "skills": [
     {
       "name": "Frontend",
-      "keywords": ["TypeScript", "React", "Astro", "Vite", "CSS", "Accessibility"]
-    },
-    {
-      "name": "AI Product",
-      "keywords": ["Prompting", "Evaluation", "Workflow Automation", "OpenAI API"]
+      "keywords": [
+        "TypeScript",
+        "React",
+        "Astro",
+        "Vite",
+        "CSS",
+        "Accessibility"
+      ]
     },
     {
       "name": "Delivery",
-      "keywords": ["GitHub Actions", "Vercel", "Testing", "Performance"]
+      "keywords": [
+        "GitHub Actions",
+        "Vercel",
+        "Testing",
+        "Performance"
+      ]
+    },
+    {
+      "name": "AI Product",
+      "keywords": [
+        "Prompting",
+        "Evaluation",
+        "Workflow Automation",
+        "OpenAI API"
+      ]
     }
   ],
   "education": [
@@ -84,13 +106,30 @@
     }
   ],
   "publisher": {
-    "redact": ["email", "phone", "location"],
+    "redact": [
+      "email",
+      "phone",
+      "location"
+    ],
     "template": "minimal-html",
     "tone": "credible, concise, evidence-first",
     "guardrails": [
       "Do not invent employers, dates, titles, degrees, metrics, or certifications.",
       "Prefer reordering and tightening over rewriting facts.",
       "Mark uncertain edits in variant notes for human review."
-    ]
+    ],
+    "variant": "acme-frontend",
+    "emphasizedKeywords": [
+      "React",
+      "TypeScript",
+      "CSS",
+      "Accessibility",
+      "Performance",
+      "Vercel",
+      "GitHub Actions",
+      "AI",
+      "Product"
+    ],
+    "reviewRequired": true
   }
 }
