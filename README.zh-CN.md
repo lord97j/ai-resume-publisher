@@ -51,7 +51,7 @@
 7. Agent 按用户履历改造网站内容、结构、文案语气和视觉表现。
 8. Agent 本地构建、预览、检查脱敏和加密解锁。
 9. Agent 从 `main` 发布主简历，从 `jd/<company-role>` 分支发布岗位定制简历。
-10. Agent 自动发布，并把公开地址、JD 地址、加密访问地址、PDF/Release 地址、加密 key 等必要结果返回给用户。
+10. Agent 自动发布，并把公开地址、JD 地址、加密访问地址、GitHub Release PDF 地址、加密 key 等必要结果返回给用户。
 
 npm scripts 是 Agent 的内部实现工具，不是面向用户的主要使用入口。
 
@@ -167,7 +167,7 @@ node scripts/recommend-style.js --role "AI 研究"
 - 主简历地址：`https://<owner>.github.io/<repo>/`
 - JD 分支名保留可读信息，方便仓库管理；公开 URL 使用 `resume.json -> publisher.publishPath` 中的随机路径。
 - JD 简历地址：`https://<owner>.github.io/<repo>/<publisher.publishPath>/`
-- JD PDF 地址：`https://<owner>.github.io/<repo>/<publisher.publishPath>/resume.pdf`
+- 公开 Pages 产物不包含 PDF 文件。需要 PDF 时，在页面解密后点击导出按钮，或使用 GitHub Release 中带时间版本的 PDF。
 - 完整私密信息仍然通过加密密文和 `#key=...` URL fragment 解锁。
 
 面向目标岗位的 Agent 流程示例：
@@ -183,7 +183,7 @@ npm run export:pdf
 git push -u origin jd/apple-frontend
 ```
 
-GitHub Action 会把该分支发布到随机的 `publisher.publishPath`，并创建带时间版本的 PDF Release。
+GitHub Action 会把该分支发布到随机的 `publisher.publishPath`，并创建带时间版本的 PDF Release，不会把 `resume.pdf` 发布到 GitHub Pages。
 
 ## 发布
 
@@ -206,9 +206,6 @@ https://<owner>.github.io/<repo>/#key=<base64url-key>
 
 JD 简历：
 https://<owner>.github.io/<repo>/<publisher.publishPath>/
-
-JD PDF：
-https://<owner>.github.io/<repo>/<publisher.publishPath>/resume.pdf
 
 PDF 历史版本：
 https://github.com/<owner>/<repo>/releases

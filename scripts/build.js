@@ -71,7 +71,7 @@ function renderPage(resume, options) {
       </div>
       <div class="actions">
         ${options.hasEncryptedResume ? '<button id="unlockButton" type="button">Unlock private</button>' : ""}
-        <button type="button" onclick="window.print()">Export PDF</button>
+        <button id="exportButton" type="button" onclick="window.print()"${options.hasEncryptedResume ? " hidden" : ""}>Export PDF</button>
       </div>
     </header>
 
@@ -157,6 +157,7 @@ function renderBullets(items) {
 function renderUnlockScript() {
   return `<script type="module">
 const button = document.querySelector("#unlockButton");
+const exportButton = document.querySelector("#exportButton");
 button?.addEventListener("click", async () => {
   const key = new URLSearchParams(location.hash.slice(1)).get("key");
   if (!key) {
@@ -171,6 +172,7 @@ button?.addEventListener("click", async () => {
     renderPrivateBasics(resume);
     button.textContent = "Private unlocked";
     button.disabled = true;
+    if (exportButton) exportButton.hidden = false;
   } catch (error) {
     console.error(error);
     alert("Could not unlock private resume. Check the key.");

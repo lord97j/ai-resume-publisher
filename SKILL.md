@@ -109,7 +109,7 @@ Before editing, read:
     - public URL;
     - JD URL when applicable;
     - encrypted URL with fragment key when applicable;
-    - PDF or releases URL;
+    - GitHub Releases PDF URL;
     - branch name and commit summary;
     - notes about any claims needing user review.
 
@@ -156,6 +156,7 @@ When the user asks to publish through GitHub:
    - `gh-pages` contains root files for `main` or the randomized `publisher.publishPath` files for the JD branch;
    - GitHub Release was created with a timestamped PDF asset;
    - public URL loads without exposing raw sensitive fields;
+   - public Pages output does not expose `resume.pdf`;
    - private URL with `#key=...` unlocks full contact details when applicable.
 
 ## Output Checklist
@@ -167,5 +168,5 @@ When the user asks to publish through GitHub:
 - Contact info is hidden unless decrypted in the browser.
 - Print/PDF export works.
 - Variant notes explain every meaningful adjustment.
-- For JD branches, `https://<owner>.github.io/<repo>/<publisher.publishPath>/` and `resume.pdf` load.
+- For JD branches, `https://<owner>.github.io/<repo>/<publisher.publishPath>/` loads and PDF is available from GitHub Releases, not public Pages.
 - The user receives URLs, branch information, and any private unlock key.

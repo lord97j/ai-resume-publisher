@@ -87,7 +87,7 @@ When publishing succeeds, return:
 
 - public resume URL;
 - encrypted private URL when applicable;
-- PDF or GitHub Releases URL;
+- GitHub Releases PDF URL;
 - branch name;
 - commit hash or short summary;
 - private unlock key material, clearly labeled for the user only.
@@ -117,7 +117,7 @@ The workflow deploys:
 
 - `main` to `https://<owner>.github.io/<repo>/`
 - `jd/company-role` to `https://<owner>.github.io/<repo>/<publisher.publishPath>/`
-- branch PDF to `https://<owner>.github.io/<repo>/<publisher.publishPath>/resume.pdf`
+- timestamped full PDF to GitHub Releases only
 
 GitHub Pages cannot password-protect different subdirectories. Use encrypted resume payloads and `#key=...` fragments for private contact details.
 
