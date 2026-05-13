@@ -69,7 +69,7 @@ jobs:
           folder: dist
           clean: true
           clean-exclude: |
-            jd/**
+            p/**
             CNAME
       - name: Deploy JD resume to gh-pages subdirectory
         if: steps.target.outputs.is_jd == 'true'
