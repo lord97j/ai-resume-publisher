@@ -10,20 +10,21 @@ const source = variant ? path.join(root, "variants", variant, "resume.json") : p
 const outDir = path.join(root, "dist");
 
 const resume = JSON.parse(await readFile(source, "utf8"));
+const style = normalizeStyle(args.style || resume.publisher?.template || "minimal-html");
 const publicResume = redactResume(resume);
 const encryptedPath = path.join(root, "public", "private-resume.enc.json");
 const hasEncryptedResume = existsSync(encryptedPath);
 
 await rm(outDir, { recursive: true, force: true });
 await mkdir(outDir, { recursive: true });
-await writeFile(path.join(outDir, "index.html"), renderPage(publicResume, { variant, hasEncryptedResume }));
+await writeFile(path.join(outDir, "index.html"), renderPage(publicResume, { variant, hasEncryptedResume, style }));
 await copyFile(path.join(root, "templates", "minimal-html", "style.css"), path.join(outDir, "style.css"));
 
 if (hasEncryptedResume) {
   await copyFile(encryptedPath, path.join(outDir, "private-resume.enc.json"));
 }
 
-console.log(`Built ${variant ? `variant "${variant}"` : "main resume"} at dist/index.html`);
+console.log(`Built ${variant ? `variant "${variant}"` : "main resume"} with style "${style}" at dist/index.html`);
 
 function parseArgs(argv) {
   const parsed = {};
@@ -43,6 +44,11 @@ function escapeHtml(value = "") {
     .replaceAll('"', "&quot;");
 }
 
+function normalizeStyle(value) {
+  const allowed = new Set(["minimal-html", "linear", "stripe", "claude", "notion", "vercel"]);
+  return allowed.has(value) ? value : "minimal-html";
+}
+
 function renderPage(resume, options) {
   const basics = resume.basics || {};
   const title = `${basics.name || "Resume"}${basics.label ? ` - ${basics.label}` : ""}`;
@@ -56,11 +62,11 @@ function renderPage(resume, options) {
   <meta name="description" content="${escapeHtml(basics.summary || title)}">
   <link rel="stylesheet" href="./style.css">
 </head>
-<body>
+<body class="style-${escapeHtml(options.style)}">
   <main class="page">
     <header class="resume-header">
       <div>
-        <p class="eyebrow">${escapeHtml(options.variant ? `Tailored resume: ${options.variant}` : "Public resume")}</p>
+        <p class="eyebrow">${escapeHtml([styleLabel(options.style), options.variant ? `Tailored resume: ${options.variant}` : "Public resume"].join(" / "))}</p>
         <h1>${escapeHtml(basics.name || "Your Name")}</h1>
         <p class="role">${escapeHtml(basics.label || "")}</p>
       </div>
@@ -84,6 +90,18 @@ function renderPage(resume, options) {
   ${options.hasEncryptedResume ? renderUnlockScript() : ""}
 </body>
 </html>`;
+}
+
+function styleLabel(styleName) {
+  const labels = {
+    "minimal-html": "Minimal",
+    linear: "Linear",
+    stripe: "Stripe",
+    claude: "Claude",
+    notion: "Notion",
+    vercel: "Vercel"
+  };
+  return labels[styleName] || labels["minimal-html"];
 }
 
 function renderContact(resume) {

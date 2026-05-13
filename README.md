@@ -13,7 +13,7 @@ Generate, tailor, encrypt, publish, and export AI resume pages from Git branches
 
 **AI Resume Publisher** is an open-source starter for job seekers who want a Git-native personal resume homepage. It ships as a static-site template plus an AI/Codex skill: the public `main` branch hosts a redacted resume, while each job description can become a tailored branch or variant with its own preview, PDF, and review notes.
 
-[Quick Start](#quick-start) • [How It Works](#how-it-works) • [Search Tools](#search-tools) • [Documentation](#documentation) • [Configuration](#configuration) • [Troubleshooting](#troubleshooting) • [License](#open-source-license)
+[Quick Start](#quick-start) • [Style Gallery](#style-gallery) • [How It Works](#how-it-works) • [Search Tools](#search-tools) • [Documentation](#documentation) • [Configuration](#configuration) • [Troubleshooting](#troubleshooting) • [License](#open-source-license)
 
 ## Demo
 
@@ -35,6 +35,38 @@ Before private unlock:
 After private unlock:
 
 ![Private resume after encrypted unlock](docs/assets/privacy-after.png)
+
+## Style Gallery
+
+The project includes five resume styles inspired by the local `design-md/` references copied from `awesome-design-md`.
+
+| Style | Best-fit roles | Branch | Build command |
+|---|---|---|---|
+| Linear | Backend, architecture, security, infrastructure | `style/linear` | `npm run build -- --style linear` |
+| Stripe | PM, growth, technical sales, SaaS full-stack | `style/stripe` | `npm run build -- --style stripe` |
+| Claude | AI research, content, market strategy, prompt engineering | `style/claude` | `npm run build -- --style claude` |
+| Notion | Operations, project management, admin, junior roles | `style/notion` | `npm run build -- --style notion` |
+| Vercel | Frontend, UI/UX engineering, startup generalists | `style/vercel` | `npm run build -- --style vercel` |
+
+Linear:
+
+![Linear resume preview](docs/assets/style-previews/linear.png)
+
+Stripe:
+
+![Stripe resume preview](docs/assets/style-previews/stripe.png)
+
+Claude:
+
+![Claude resume preview](docs/assets/style-previews/claude.png)
+
+Notion:
+
+![Notion resume preview](docs/assets/style-previews/notion.png)
+
+Vercel:
+
+![Vercel resume preview](docs/assets/style-previews/vercel.png)
 
 ## Quick Start
 
@@ -66,6 +98,23 @@ Build a tailored resume variant from a JD:
 ```bash
 npm run tailor -- --jd examples/frontend-jd.md --slug acme-frontend
 npm run build -- --variant acme-frontend
+```
+
+Build with a specific visual style:
+
+```bash
+npm run build -- --style linear
+npm run build -- --style stripe
+npm run build -- --style claude
+npm run build -- --style notion
+npm run build -- --style vercel
+```
+
+Recommend a style from a role:
+
+```bash
+node scripts/recommend-style.js --role "backend architect"
+node scripts/recommend-style.js --role "AI research"
 ```
 
 Export a timestamped PDF:
@@ -144,7 +193,9 @@ gh api repos/<owner>/<repo>/pages
 | Skill workflow | [`SKILL.md`](SKILL.md) |
 | Chinese documentation | [`README.zh-CN.md`](README.zh-CN.md) |
 | Resume schema sample | [`resume.json`](resume.json) |
+| Style design references | [`design-md/`](design-md/README.md) |
 | Static builder | [`scripts/build.js`](scripts/build.js) |
+| Style recommender | [`scripts/recommend-style.js`](scripts/recommend-style.js) |
 | JD variant generator | [`scripts/tailor.js`](scripts/tailor.js) |
 | Redaction helpers | [`scripts/redact.js`](scripts/redact.js) |
 | Encryption | [`scripts/encrypt.js`](scripts/encrypt.js) |
@@ -161,10 +212,21 @@ Edit `resume.json`. The shape is compatible with the spirit of JSON Resume and a
 {
   "publisher": {
     "redact": ["email", "phone", "location"],
-    "template": "minimal-html",
+    "template": "linear",
     "tone": "credible, concise, evidence-first"
   }
 }
+```
+
+Supported `publisher.template` values:
+
+```txt
+minimal-html
+linear
+stripe
+claude
+notion
+vercel
 ```
 
 ### Redaction

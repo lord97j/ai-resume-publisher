@@ -9,6 +9,7 @@
     "tailor": "node scripts/tailor.js",
     "encrypt": "node scripts/encrypt.js",
     "export:pdf": "node scripts/export-pdf.js",
+    "preview:styles": "node scripts/export-style-previews.js",
     "clean": "node scripts/clean.js"
   },
   "keywords": [

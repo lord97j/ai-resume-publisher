@@ -11,7 +11,7 @@
 
 AI Resume Publisher 是一个面向求职者的开源简历发布系统：用 `resume.json` 作为主数据源，通过 AI/Codex skill 生成静态个人简历主页，并支持 JD 定制版本、GitHub Pages 发布、私密完整简历加密访问，以及按时间和提交版本输出 PDF 到 GitHub Releases。
 
-[快速开始](#快速开始) • [工作原理](#工作原理) • [搜索工具](#搜索工具) • [文档](#文档) • [配置](#配置) • [排障](#排障) • [开源协议](#开源协议)
+[快速开始](#快速开始) • [风格展示](#风格展示) • [工作原理](#工作原理) • [搜索工具](#搜索工具) • [文档](#文档) • [配置](#配置) • [排障](#排障) • [开源协议](#开源协议)
 
 ## Demo
 
@@ -33,6 +33,38 @@ AI Resume Publisher 是一个面向求职者的开源简历发布系统：用 `r
 加密解锁后：
 
 ![加密解锁后的完整私密简历](docs/assets/privacy-after.png)
+
+## 风格展示
+
+项目内置 5 种简历风格，设计依据来自本仓库 `design-md/` 中保存的 `awesome-design-md` 设计文件。
+
+| 风格 | 适合岗位 | 分支 | 构建命令 |
+|---|---|---|---|
+| Linear | 后端、架构、安全、基础设施 | `style/linear` | `npm run build -- --style linear` |
+| Stripe | PM、增长、技术销售、SaaS 全栈 | `style/stripe` | `npm run build -- --style stripe` |
+| Claude | AI 研究、内容、市场策划、提示词工程 | `style/claude` | `npm run build -- --style claude` |
+| Notion | 运营、项目管理、行政、职场新人 | `style/notion` | `npm run build -- --style notion` |
+| Vercel | 前端、UI/UX、初创团队通用人才 | `style/vercel` | `npm run build -- --style vercel` |
+
+Linear：
+
+![Linear 简历预览](docs/assets/style-previews/linear.png)
+
+Stripe：
+
+![Stripe 简历预览](docs/assets/style-previews/stripe.png)
+
+Claude：
+
+![Claude 简历预览](docs/assets/style-previews/claude.png)
+
+Notion：
+
+![Notion 简历预览](docs/assets/style-previews/notion.png)
+
+Vercel：
+
+![Vercel 简历预览](docs/assets/style-previews/vercel.png)
 
 ## 快速开始
 
@@ -60,6 +92,23 @@ npm run build
 ```bash
 npm run tailor -- --jd examples/frontend-jd.md --slug acme-frontend
 npm run build -- --variant acme-frontend
+```
+
+指定视觉风格构建：
+
+```bash
+npm run build -- --style linear
+npm run build -- --style stripe
+npm run build -- --style claude
+npm run build -- --style notion
+npm run build -- --style vercel
+```
+
+根据岗位推荐风格：
+
+```bash
+node scripts/recommend-style.js --role "后端架构师"
+node scripts/recommend-style.js --role "AI 研究"
 ```
 
 导出带时间版本的 PDF：
@@ -136,7 +185,9 @@ gh api repos/<owner>/<repo>/pages
 | Skill 工作流 | [`SKILL.md`](SKILL.md) |
 | 英文文档 | [`README.md`](README.md) |
 | 简历数据样例 | [`resume.json`](resume.json) |
+| 风格设计文件 | [`design-md/`](design-md/README.md) |
 | 静态站点构建 | [`scripts/build.js`](scripts/build.js) |
+| 风格推荐脚本 | [`scripts/recommend-style.js`](scripts/recommend-style.js) |
 | JD 变体生成 | [`scripts/tailor.js`](scripts/tailor.js) |
 | 脱敏逻辑 | [`scripts/redact.js`](scripts/redact.js) |
 | 加密逻辑 | [`scripts/encrypt.js`](scripts/encrypt.js) |
@@ -153,10 +204,21 @@ gh api repos/<owner>/<repo>/pages
 {
   "publisher": {
     "redact": ["email", "phone", "location"],
-    "template": "minimal-html",
+    "template": "linear",
     "tone": "credible, concise, evidence-first"
   }
 }
+```
+
+支持的 `publisher.template`：
+
+```txt
+minimal-html
+linear
+stripe
+claude
+notion
+vercel
 ```
 
 ### 脱敏

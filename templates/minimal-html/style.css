@@ -220,3 +220,239 @@ li + li {
     display: none;
   }
 }
+
+/* Linear-inspired: near-black, dense, precise, lavender accent. */
+.style-linear {
+  color-scheme: dark;
+  --ink: #f7f8f8;
+  --muted: #9ca3af;
+  --line: #2a2b2f;
+  --paper: #0f1011;
+  --accent: #5e6ad2;
+  --accent-ink: #aeb6ff;
+  background: #010102;
+  font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+}
+
+.style-linear .page {
+  max-width: 1040px;
+  background: linear-gradient(180deg, #111217 0%, #0b0c0f 100%);
+  border-color: #26272d;
+  box-shadow: 0 0 0 1px rgba(94, 106, 210, 0.12), 0 24px 80px rgba(0, 0, 0, 0.38);
+}
+
+.style-linear h1 {
+  letter-spacing: 0;
+  font-weight: 700;
+}
+
+.style-linear .resume-header {
+  border-bottom-color: #2a2b2f;
+}
+
+.style-linear .contact-grid div,
+.style-linear h2 {
+  border-color: #25262b;
+}
+
+.style-linear h2,
+.style-linear .eyebrow {
+  color: #aeb6ff;
+}
+
+.style-linear button {
+  border-radius: 4px;
+  border-color: #5e6ad2;
+  background: #5e6ad2;
+}
+
+.style-linear button + button,
+.style-linear .tags span {
+  color: #d9ddff;
+  background: #151621;
+  border-color: #30314a;
+}
+
+/* Stripe-inspired: light SaaS canvas, indigo CTA, soft gradient mesh. */
+.style-stripe {
+  --ink: #0d253d;
+  --muted: #64748d;
+  --line: #e3e8ee;
+  --paper: #ffffff;
+  --accent: #533afd;
+  --accent-ink: #4434d4;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(249, 107, 238, 0.28), transparent 26%),
+    radial-gradient(circle at 55% 5%, rgba(83, 58, 253, 0.22), transparent 30%),
+    radial-gradient(circle at 88% 0%, rgba(245, 233, 212, 0.95), transparent 28%),
+    #f6f9fc;
+  font: 15px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+.style-stripe .page {
+  border: 1px solid rgba(227, 232, 238, 0.9);
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(0, 55, 112, 0.12);
+}
+
+.style-stripe h1 {
+  font-weight: 300;
+  letter-spacing: 0;
+}
+
+.style-stripe .resume-header {
+  border-bottom-color: #e3e8ee;
+}
+
+.style-stripe button {
+  border-radius: 999px;
+  border-color: #533afd;
+  background: #533afd;
+  font-weight: 500;
+}
+
+.style-stripe button + button,
+.style-stripe .tags span {
+  color: #4434d4;
+  background: #eef0ff;
+  border-color: #cfd5ff;
+}
+
+/* Claude-inspired: warm editorial canvas, serif display, coral accent. */
+.style-claude {
+  --ink: #141413;
+  --muted: #6c6a64;
+  --line: #e6dfd8;
+  --paper: #faf9f5;
+  --accent: #cc785c;
+  --accent-ink: #a9583e;
+  background: #f5f0e8;
+  font: 16px/1.62 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.style-claude .page {
+  border-color: #e6dfd8;
+  border-radius: 12px;
+  background: #faf9f5;
+}
+
+.style-claude h1,
+.style-claude h2,
+.style-claude h3 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+}
+
+.style-claude h1 {
+  letter-spacing: 0;
+}
+
+.style-claude .resume-header {
+  border-bottom-color: #181715;
+}
+
+.style-claude button {
+  border-radius: 8px;
+  border-color: #cc785c;
+  background: #cc785c;
+}
+
+.style-claude button + button,
+.style-claude .tags span {
+  color: #a9583e;
+  background: #efe9de;
+  border-color: #e6dfd8;
+}
+
+/* Notion-inspired: block structure, warm white, document clarity. */
+.style-notion {
+  --ink: #191919;
+  --muted: #6b6b6b;
+  --line: #e8e5df;
+  --paper: #ffffff;
+  --accent: #5645d4;
+  --accent-ink: #4534b3;
+  background: #f7f6f3;
+  font: 15px/1.58 Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+.style-notion .page {
+  border-color: #e8e5df;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(25, 25, 25, 0.04);
+}
+
+.style-notion h1 {
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  letter-spacing: 0;
+}
+
+.style-notion h2 {
+  text-transform: none;
+  font-size: 1.15rem;
+}
+
+.style-notion .entry,
+.style-notion .skill-list > div {
+  padding: 14px 16px;
+  border: 1px solid #e8e5df;
+  border-radius: 8px;
+  background: #fbfbfa;
+}
+
+.style-notion button {
+  border-radius: 8px;
+  border-color: #5645d4;
+  background: #5645d4;
+}
+
+.style-notion button + button,
+.style-notion .tags span {
+  color: #4534b3;
+  background: #f1f0fb;
+  border-color: #ddd9fb;
+}
+
+/* Vercel-inspired: stark monochrome, high contrast, technical precision. */
+.style-vercel {
+  --ink: #000000;
+  --muted: #666666;
+  --line: #eaeaea;
+  --paper: #ffffff;
+  --accent: #000000;
+  --accent-ink: #000000;
+  background: #ffffff;
+  font: 15px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.style-vercel .page {
+  max-width: 1000px;
+  border-color: #000000;
+  border-radius: 0;
+}
+
+.style-vercel h1 {
+  letter-spacing: 0;
+  font-weight: 650;
+}
+
+.style-vercel h2 {
+  letter-spacing: 0;
+}
+
+.style-vercel .resume-header {
+  border-bottom: 1px solid #000000;
+}
+
+.style-vercel button {
+  border-radius: 0;
+  border-color: #000000;
+  background: #000000;
+}
+
+.style-vercel button + button,
+.style-vercel .tags span {
+  color: #000000;
+  background: #ffffff;
+  border-color: #000000;
+}
