@@ -11,18 +11,15 @@ permissions:
   contents: write
   pages: write
   id-token: write
-  actions: read
+  actions: write
 
 concurrency:
   group: pages-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  publish:
+  build-and-publish:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -78,6 +75,42 @@ jobs:
           folder: dist
           target-folder: ${{ steps.target.outputs.target_folder }}
           clean: true
+      - name: Create release with PDF
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PDF_PATH="$(ls release/resume-*.pdf | head -n 1)"
+          TAG="resume-${{ steps.target.outputs.safe_ref }}-${RESUME_VERSION}-${GITHUB_RUN_NUMBER}"
+          gh release create "$TAG" "$PDF_PATH" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Resume ${{ github.ref_name }} ${RESUME_VERSION}" \
+            --notes "Automated resume PDF export for ${GITHUB_SHA}."
+      - name: Trigger main Pages deployment for JD branch
+        if: steps.target.outputs.is_jd == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --repo "$GITHUB_REPOSITORY" --ref main
+      - name: Print published paths
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+          OWNER="${GITHUB_REPOSITORY_OWNER}"
+          BASE_URL="https://${OWNER}.github.io/${REPO_NAME}/"
+          echo "Main resume: ${BASE_URL}"
+          if [[ "${{ steps.target.outputs.is_jd }}" == "true" ]]; then
+            echo "JD resume: ${BASE_URL}${{ steps.target.outputs.target_folder }}/"
+            echo "JD PDF: ${BASE_URL}${{ steps.target.outputs.target_folder }}/resume.pdf"
+          else
+            echo "Main PDF: ${BASE_URL}resume.pdf"
+          fi
+
+  deploy-pages:
+    if: github.ref_name == 'main'
+    needs: build-and-publish
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Checkout aggregated gh-pages site
         uses: actions/checkout@v4
         with:
@@ -92,25 +125,3 @@ jobs:
       - name: Deploy aggregated Pages site
         id: deployment
         uses: actions/deploy-pages@v4
-      - name: Create release with PDF
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          PDF_PATH="$(ls release/resume-*.pdf | head -n 1)"
-          TAG="resume-${{ steps.target.outputs.safe_ref }}-${RESUME_VERSION}"
-          gh release create "$TAG" "$PDF_PATH" \
-            --repo "$GITHUB_REPOSITORY" \
-            --title "Resume ${{ github.ref_name }} ${RESUME_VERSION}" \
-            --notes "Automated resume PDF export for ${GITHUB_SHA}."
-      - name: Print published paths
-        run: |
-          REPO_NAME="${GITHUB_REPOSITORY#*/}"
-          OWNER="${GITHUB_REPOSITORY_OWNER}"
-          BASE_URL="https://${OWNER}.github.io/${REPO_NAME}/"
-          echo "Main resume: ${BASE_URL}"
-          if [[ "${{ steps.target.outputs.is_jd }}" == "true" ]]; then
-            echo "JD resume: ${BASE_URL}${{ steps.target.outputs.target_folder }}/"
-            echo "JD PDF: ${BASE_URL}${{ steps.target.outputs.target_folder }}/resume.pdf"
-          else
-            echo "Main PDF: ${BASE_URL}resume.pdf"
-          fi
