@@ -7,7 +7,7 @@ import { spawn } from "node:child_process";
 const root = process.cwd();
 const args = parseArgs(process.argv.slice(2));
 const version = args.version || timestampVersion();
-const distDir = join(root, "dist");
+const distDir = resolve(root, args.source || args.dist || "dist");
 const releaseDir = join(root, "release");
 const pdfPath = join(releaseDir, `resume-${version}.pdf`);
 const chromeBin = findChrome();

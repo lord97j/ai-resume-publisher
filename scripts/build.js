@@ -7,24 +7,24 @@ const root = process.cwd();
 const args = parseArgs(process.argv.slice(2));
 const variant = args.variant;
 const source = variant ? path.join(root, "variants", variant, "resume.json") : path.join(root, "resume.json");
-const outDir = path.join(root, "dist");
+const outDir = path.join(root, args["out-dir"] || "dist");
 
 const resume = JSON.parse(await readFile(source, "utf8"));
 const style = normalizeStyle(args.style || resume.publisher?.template || "minimal-html");
-const publicResume = redactResume(resume);
+const outputResume = args.private ? resume : redactResume(resume);
 const encryptedPath = path.join(root, "public", "private-resume.enc.json");
-const hasEncryptedResume = existsSync(encryptedPath);
+const hasEncryptedResume = !args.private && existsSync(encryptedPath);
 
 await rm(outDir, { recursive: true, force: true });
 await mkdir(outDir, { recursive: true });
-await writeFile(path.join(outDir, "index.html"), renderPage(publicResume, { variant, hasEncryptedResume, style }));
+await writeFile(path.join(outDir, "index.html"), renderPage(outputResume, { variant, hasEncryptedResume, style }));
 await copyFile(path.join(root, "templates", "minimal-html", "style.css"), path.join(outDir, "style.css"));
 
 if (hasEncryptedResume) {
   await copyFile(encryptedPath, path.join(outDir, "private-resume.enc.json"));
 }
 
-console.log(`Built ${variant ? `variant "${variant}"` : "main resume"} with style "${style}" at dist/index.html`);
+console.log(`Built ${args.private ? "private " : ""}${variant ? `variant "${variant}"` : "main resume"} with style "${style}" at ${path.relative(root, outDir)}/index.html`);
 
 function parseArgs(argv) {
   const parsed = {};

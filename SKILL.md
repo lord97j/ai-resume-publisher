@@ -89,6 +89,13 @@ Before editing, read:
     npm run export:pdf
     ```
 
+    For a full private PDF destined for GitHub Releases:
+
+    ```bash
+    npm run build -- --private --out-dir dist-private
+    npm run export:pdf -- --source dist-private
+    ```
+
 12. If the user wants encrypted private details:
 
     ```bash

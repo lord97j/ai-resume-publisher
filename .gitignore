@@ -23,6 +23,7 @@ rad.json
 TestResults.xml
 
 dist/
+dist-private/
 release/
 node_modules/
 .DS_Store

@@ -46,7 +46,8 @@ jobs:
           VERSION="$(date -u +'%Y.%m.%d.%H%M')"
           SHORT_SHA="${GITHUB_SHA::7}"
           echo "RESUME_VERSION=${VERSION}-${SHORT_SHA}" >> "$GITHUB_ENV"
-          npm run export:pdf -- --version "${VERSION}-${SHORT_SHA}"
+          npm run build -- --private --out-dir dist-private
+          npm run export:pdf -- --source dist-private --version "${VERSION}-${SHORT_SHA}"
           touch dist/.nojekyll
       - name: Resolve deploy target
         id: target

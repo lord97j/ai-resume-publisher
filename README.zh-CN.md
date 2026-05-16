@@ -125,6 +125,13 @@ npm run encrypt
 npm run export:pdf
 ```
 
+如果要生成放入 GitHub Release 的完整私密 PDF，使用私密构建产物导出：
+
+```bash
+npm run build -- --private --out-dir dist-private
+npm run export:pdf -- --source dist-private
+```
+
 如果用户希望使用好记的自定义 key：
 
 ```bash
@@ -174,7 +181,7 @@ node scripts/recommend-style.js --role "AI 研究"
 - 主简历地址：`https://<owner>.github.io/<repo>/`
 - JD 分支名保留可读信息，方便仓库管理；公开 URL 使用 `resume.json -> publisher.publishPath` 中的随机路径。
 - JD 简历地址：`https://<owner>.github.io/<repo>/<publisher.publishPath>/`
-- 公开 Pages 产物不包含 PDF 文件。需要 PDF 时，在页面解密后点击导出按钮，或使用 GitHub Release 中带时间版本的 PDF。
+- 公开 Pages 产物不包含 PDF 文件。需要 PDF 时，在页面解密后点击导出按钮，或使用 GitHub Release 中由私密构建生成的带时间版本 PDF。
 - 完整私密信息仍然通过加密密文和 `#key=...` URL fragment 解锁。
 - 如果公开页也要隐藏微信、LinkedIn、博客等 profile/contact 链接，在 `publisher.redact` 中加入 `profiles` 或 `contact`。
 - 如果 `publisher.redact` 包含 `company`，公开经历里的公司名会用 `**` 做中间脱敏。

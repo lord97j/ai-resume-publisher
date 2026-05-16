@@ -60,6 +60,13 @@ npm run build
 npm run export:pdf
 ```
 
+Full private PDF for GitHub Releases:
+
+```bash
+npm run build -- --private --out-dir dist-private
+npm run export:pdf -- --source dist-private
+```
+
 Encrypted private resume checks:
 
 ```bash
