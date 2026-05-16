@@ -176,6 +176,7 @@ This repo uses a GitHub Pages aggregation workflow for role-specific resumes:
 - JD resume URL: `https://<owner>.github.io/<repo>/<publisher.publishPath>/`
 - Public Pages output does not include PDF files. Use the in-page export button after private unlock, or the timestamped GitHub Release PDF.
 - Full private details still use encrypted payloads and `#key=...` URL fragments.
+- Use `profiles` or `contact` in `publisher.redact` when public pages should hide profile/contact links such as WeChat, LinkedIn, or personal blogs.
 - If `publisher.redact` includes `company`, public experience company names are masked with `**`.
 
 Example Agent flow for a target role:

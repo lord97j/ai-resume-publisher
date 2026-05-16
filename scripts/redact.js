@@ -1,29 +1,27 @@
 export function redactResume(resume) {
   const clone = structuredClone(resume);
   const fields = new Set(clone.publisher?.redact || []);
+  const shouldRedactCompany = fields.has("company") || fields.has("work.name");
+  const companyMap = shouldRedactCompany ? buildCompanyMap(clone.work || []) : [];
 
-  if (fields.has("email") && clone.basics?.email) {
+  if ((fields.has("email") || fields.has("contact")) && clone.basics?.email) {
     clone.basics.email = "Available in private resume";
   }
 
-  if (fields.has("phone") && clone.basics?.phone) {
+  if ((fields.has("phone") || fields.has("contact")) && clone.basics?.phone) {
     clone.basics.phone = "Available in private resume";
   }
 
   if (fields.has("location") && clone.basics?.location) {
-    clone.basics.location = {
-      city: clone.basics.location.city || "",
-      region: clone.basics.location.region || "",
-      countryCode: clone.basics.location.countryCode || ""
-    };
-    delete clone.basics.location.address;
-    delete clone.basics.location.postalCode;
+    clone.basics.location = {};
   }
 
-  if ((fields.has("company") || fields.has("work.name")) && Array.isArray(clone.work)) {
-    for (const item of clone.work) {
-      if (item.name) item.name = maskMiddle(item.name);
-    }
+  if ((fields.has("profiles") || fields.has("contact")) && clone.basics?.profiles) {
+    clone.basics.profiles = [];
+  }
+
+  if (shouldRedactCompany) {
+    replaceCompanyNames(clone, companyMap);
   }
 
   return clone;
@@ -57,4 +55,60 @@ function maskMiddle(value) {
 
   const edge = chars.length <= 4 ? 1 : 2;
   return `${chars.slice(0, edge).join("")}**${chars.slice(-edge).join("")}`;
+}
+
+function buildCompanyMap(items) {
+  const aliases = new Set();
+  for (const item of items) {
+    for (const alias of companyAliases(item.name || "")) {
+      if (alias.length >= 2) aliases.add(alias);
+    }
+  }
+
+  return [...aliases]
+    .sort((a, b) => b.length - a.length)
+    .map((alias) => [alias, maskMiddle(alias)]);
+}
+
+function companyAliases(value) {
+  const text = String(value).trim();
+  if (!text) return [];
+
+  const aliases = new Set([text]);
+  const bracketMatches = text.matchAll(/[（(]([^（）()]+)[）)]/g);
+  for (const match of bracketMatches) aliases.add(match[1].trim());
+
+  const withoutBracket = text.replace(/[（(][^（）()]+[）)]/g, "").trim();
+  if (withoutBracket) aliases.add(withoutBracket);
+
+  const shortName = withoutBracket
+    .replace(/^(北京|上海|广州|深圳|杭州|南京|成都|武汉|西安|中国)/, "")
+    .replace(/(信息安全技术有限公司|科技有限公司|股份有限公司|技术有限公司|有限公司|公司)$/g, "")
+    .trim();
+  if (shortName) aliases.add(shortName);
+
+  return [...aliases];
+}
+
+function replaceCompanyNames(value, companyMap) {
+  if (!value || !companyMap.length) return value;
+
+  if (typeof value === "string") {
+    return companyMap.reduce((text, [needle, replacement]) => text.replaceAll(needle, replacement), value);
+  }
+
+  if (Array.isArray(value)) {
+    for (let index = 0; index < value.length; index += 1) {
+      value[index] = replaceCompanyNames(value[index], companyMap);
+    }
+    return value;
+  }
+
+  if (typeof value === "object") {
+    for (const key of Object.keys(value)) {
+      value[key] = replaceCompanyNames(value[key], companyMap);
+    }
+  }
+
+  return value;
 }

@@ -33,6 +33,7 @@ This repository is an Agent skill plus a reference resume-site implementation. Y
 ## Privacy Rules
 
 - Put direct contact fields and precise location in `publisher.redact` unless the user explicitly wants them public.
+- Treat profile links such as WeChat, LinkedIn, personal blogs, and direct social handles as contact fields when `profiles` or `contact` is redacted.
 - Include `company` in `publisher.redact` by default so public work history masks employer names with `**`.
 - `public/private-resume.enc.json` may be committed because it is ciphertext.
 - The printed `#key=...` fragment must only be returned to the user. Never commit it to public repositories.

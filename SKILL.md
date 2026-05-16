@@ -51,7 +51,7 @@ Before editing, read:
    - private repository or fork preference
 3. If needed and approved, create a private repository or fork this repo.
 4. Normalize the user's resume into `resume.json`.
-5. Set `publisher.redact` for public privacy. Use `["email", "phone", "location", "company"]` by default unless the user asks otherwise.
+5. Set `publisher.redact` for public privacy. Use `["email", "phone", "location", "profiles", "company"]` by default unless the user asks otherwise.
 6. Choose a design direction:
    - read `design-md/README.md`;
    - inspect the most relevant `design-md/*.md`;
