@@ -84,7 +84,7 @@
     }
   ],
   "publisher": {
-    "redact": ["email", "phone", "location"],
+    "redact": ["email", "phone", "location", "company"],
     "template": "minimal-html",
     "tone": "credible, concise, evidence-first",
     "guardrails": [

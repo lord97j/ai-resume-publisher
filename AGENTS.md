@@ -33,8 +33,10 @@ This repository is an Agent skill plus a reference resume-site implementation. Y
 ## Privacy Rules
 
 - Put direct contact fields and precise location in `publisher.redact` unless the user explicitly wants them public.
+- Include `company` in `publisher.redact` by default so public work history masks employer names with `**`.
 - `public/private-resume.enc.json` may be committed because it is ciphertext.
-- The printed `#key=...` fragment must only be returned to the user. Never commit it.
+- The printed `#key=...` fragment must only be returned to the user. Never commit it to public repositories.
+- Prefer `RESUME_PRIVATE_KEY` for stable private-repo publishing. Use `npm run encrypt -- --key "<user-key>"` for user-chosen keys. `public/decrypt.key` is local and ignored.
 - Check `dist/index.html` before publishing to ensure sensitive fields are not visible in the public HTML.
 
 ## Implementation Guidance
@@ -61,6 +63,13 @@ Encrypted private resume checks:
 
 ```bash
 npm run encrypt
+npm run build
+```
+
+Custom key check:
+
+```bash
+npm run encrypt -- --key "<user-key>"
 npm run build
 ```
 

@@ -20,6 +20,12 @@ export function redactResume(resume) {
     delete clone.basics.location.postalCode;
   }
 
+  if ((fields.has("company") || fields.has("work.name")) && Array.isArray(clone.work)) {
+    for (const item of clone.work) {
+      if (item.name) item.name = maskMiddle(item.name);
+    }
+  }
+
   return clone;
 }
 
@@ -42,4 +48,13 @@ export function publicContactItems(resume) {
   }
 
   return items.filter((item) => item.value);
+}
+
+function maskMiddle(value) {
+  const chars = Array.from(String(value).trim());
+  if (chars.length <= 1) return chars.join("");
+  if (chars.length === 2) return `${chars[0]}**`;
+
+  const edge = chars.length <= 4 ? 1 : 2;
+  return `${chars.slice(0, edge).join("")}**${chars.slice(-edge).join("")}`;
 }

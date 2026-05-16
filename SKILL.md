@@ -31,6 +31,7 @@ Before editing, read:
 - Do not exaggerate seniority or claim technologies the user did not provide.
 - Keep uncertain claims in notes for user confirmation.
 - Do not expose private contact fields on the public homepage.
+- If the user asks for public redaction, include company-name masking unless they explicitly want employers public.
 - Treat hidden paths as convenience links, not security.
 - For private full resumes, use encrypted payloads and URL fragment keys.
 - Never commit the printed `#key=...` value.
@@ -50,7 +51,7 @@ Before editing, read:
    - private repository or fork preference
 3. If needed and approved, create a private repository or fork this repo.
 4. Normalize the user's resume into `resume.json`.
-5. Set `publisher.redact` for public privacy.
+5. Set `publisher.redact` for public privacy. Use `["email", "phone", "location", "company"]` by default unless the user asks otherwise.
 6. Choose a design direction:
    - read `design-md/README.md`;
    - inspect the most relevant `design-md/*.md`;
@@ -96,6 +97,13 @@ Before editing, read:
     ```
 
     Capture the printed `/#key=...` suffix for the user only.
+    If the user provides a custom key, run:
+
+    ```bash
+    npm run encrypt -- --key "<user-key>"
+    ```
+
+    For GitHub Actions, set the private repository secret `RESUME_PRIVATE_KEY` to keep the key stable without committing it. In a private repository only, `resume.json -> publisher.encryption.key` may be used when the user explicitly wants the key in repo config.
 
 13. Browser-check the generated site:
     - public page loads;
@@ -163,6 +171,7 @@ When the user asks to publish through GitHub:
 
 - `resume.json` contains only user-supported facts.
 - `publisher.redact` protects direct contact and location details as requested.
+- Public company names are masked with `**` when `publisher.redact` includes `company`.
 - The selected `design-md/*.md` is reflected in the actual page.
 - `dist/index.html` renders the public or tailored resume.
 - Contact info is hidden unless decrypted in the browser.

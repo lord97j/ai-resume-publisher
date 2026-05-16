@@ -22,8 +22,7 @@
 参考公开简历主页：
 [https://lord97j.github.io/ai-resume-publisher/](https://lord97j.github.io/ai-resume-publisher/)
 
-参考加密完整简历：
-[https://lord97j.github.io/ai-resume-publisher/#key=farKpQkucG44mZcmLIa3Bz2jlDy9hZMxBvyRS4wXU6k](https://lord97j.github.io/ai-resume-publisher/#key=farKpQkucG44mZcmLIa3Bz2jlDy9hZMxBvyRS4wXU6k)
+加密完整简历通过 `npm run encrypt` 生成的 `#key=...` fragment 解锁。真实私密 key 不应该写进公开 README。
 
 参考最新版 PDF：
 [GitHub Releases](https://github.com/lord97j/ai-resume-publisher/releases/latest)
@@ -126,6 +125,14 @@ npm run encrypt
 npm run export:pdf
 ```
 
+如果用户希望使用好记的自定义 key：
+
+```bash
+npm run encrypt -- --key "用户自定义-key"
+```
+
+key 来源优先级是：`--key`、`RESUME_PRIVATE_KEY`、私有仓库里的 `resume.json -> publisher.encryption.key`、已存在且被忽略的 `public/decrypt.key`，最后才随机生成。GitHub Actions 推荐使用仓库 secret `RESUME_PRIVATE_KEY`；只有私有仓库才适合把 key 写进 `publisher.encryption.key`。
+
 生成岗位定制版本：
 
 ```bash
@@ -169,6 +176,7 @@ node scripts/recommend-style.js --role "AI 研究"
 - JD 简历地址：`https://<owner>.github.io/<repo>/<publisher.publishPath>/`
 - 公开 Pages 产物不包含 PDF 文件。需要 PDF 时，在页面解密后点击导出按钮，或使用 GitHub Release 中带时间版本的 PDF。
 - 完整私密信息仍然通过加密密文和 `#key=...` URL fragment 解锁。
+- 如果 `publisher.redact` 包含 `company`，公开经历里的公司名会用 `**` 做中间脱敏。
 
 面向目标岗位的 Agent 流程示例：
 
@@ -202,7 +210,7 @@ GitHub Action 会把该分支发布到随机的 `publisher.publishPath`，并创
 https://<owner>.github.io/<repo>/
 
 加密完整简历：
-https://<owner>.github.io/<repo>/#key=<base64url-key>
+https://<owner>.github.io/<repo>/#key=<private-key>
 
 JD 简历：
 https://<owner>.github.io/<repo>/<publisher.publishPath>/
@@ -228,6 +236,7 @@ https://github.com/<owner>/<repo>/releases/latest
 | Pages 返回 `404` | 等 workflow 完成后，运行 `gh api repos/<owner>/<repo>/pages` |
 | JD 分支访问不到 | 确认分支名以 `jd/` 开头，再检查 `resume.json -> publisher.publishPath` 中的随机路径 |
 | 私密解锁失败 | 确认 `public/private-resume.enc.json` 和 `#key=...` 来自同一次 `npm run encrypt` |
+| 自定义 key 容易忘 | 存到私有仓库 secret `RESUME_PRIVATE_KEY`，或本地重新执行 `npm run encrypt -- --key "<key>"` |
 | PDF 导出找不到 Chrome | 设置 `CHROME_BIN=/path/to/chrome` 后重试 `npm run export:pdf` |
 | Release 没生成 | 用 `gh run view <run-id> --log-failed` 查看日志，并检查 workflow `contents: write` 权限 |
 | 公开页露出敏感信息 | 检查 `publisher.redact`，重新 `npm run build`，发布前检查 `dist/index.html` |

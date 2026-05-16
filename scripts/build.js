@@ -180,14 +180,40 @@ button?.addEventListener("click", async () => {
 });
 
 async function decryptPayload(payload, keyText) {
-  const keyBytes = base64urlToBytes(keyText);
-  const cryptoKey = await crypto.subtle.importKey("raw", keyBytes, "AES-GCM", false, ["decrypt"]);
+  const cryptoKey = await importDecryptKey(payload, keyText);
   const data = await crypto.subtle.decrypt(
     { name: "AES-GCM", iv: base64urlToBytes(payload.iv) },
     cryptoKey,
     base64urlToBytes(payload.ciphertext)
   );
   return JSON.parse(new TextDecoder().decode(data));
+}
+
+async function importDecryptKey(payload, keyText) {
+  if (payload.keyDerivation?.type === "PBKDF2-SHA256") {
+    const keyMaterial = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(keyText),
+      "PBKDF2",
+      false,
+      ["deriveKey"]
+    );
+    return crypto.subtle.deriveKey(
+      {
+        name: "PBKDF2",
+        hash: "SHA-256",
+        salt: base64urlToBytes(payload.keyDerivation.salt),
+        iterations: payload.keyDerivation.iterations || 210000
+      },
+      keyMaterial,
+      { name: "AES-GCM", length: 256 },
+      false,
+      ["decrypt"]
+    );
+  }
+
+  const keyBytes = base64urlToBytes(keyText);
+  return crypto.subtle.importKey("raw", keyBytes, "AES-GCM", false, ["decrypt"]);
 }
 
 function base64urlToBytes(value) {
