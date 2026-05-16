@@ -36,6 +36,7 @@ Before editing, read:
 - For private full resumes, use encrypted payloads and URL fragment keys.
 - Never commit the printed `#key=...` value.
 - Ask before creating repositories, pushing branches, enabling Pages, or publishing publicly.
+- GitHub Pages may be unavailable for private repositories depending on the user's GitHub plan. If private Pages cannot be enabled, keep the source repository private and publish the redacted `dist/` artifact to Vercel or a separate public Pages repository.
 
 ## Agent Workflow
 

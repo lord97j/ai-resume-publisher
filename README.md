@@ -186,6 +186,8 @@ This repo uses a GitHub Pages aggregation workflow for role-specific resumes:
 - Use `profiles` or `contact` in `publisher.redact` when public pages should hide profile/contact links such as WeChat, LinkedIn, or personal blogs.
 - If `publisher.redact` includes `company`, public experience company names are masked with `**`.
 
+GitHub Pages may not be available for private repositories on every GitHub plan. For private source repositories, publish the redacted `dist/` artifact to Vercel or to a separate public Pages repository, while keeping source and Release PDFs private.
+
 Example Agent flow for a target role:
 
 ```bash

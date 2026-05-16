@@ -100,6 +100,8 @@ Before any external action, ask for user consent:
 - Publish from `main`.
 - Publish from a `jd/<slug>` branch or preview host.
 
+If GitHub reports that the user's plan does not support Pages for a private repository, do not make the source repository public automatically. Use Vercel or a separate public artifact-only Pages repository for the redacted site.
+
 When publishing succeeds, return:
 
 - public resume URL;

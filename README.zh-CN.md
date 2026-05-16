@@ -186,6 +186,8 @@ node scripts/recommend-style.js --role "AI 研究"
 - 如果公开页也要隐藏微信、LinkedIn、博客等 profile/contact 链接，在 `publisher.redact` 中加入 `profiles` 或 `contact`。
 - 如果 `publisher.redact` 包含 `company`，公开经历里的公司名会用 `**` 做中间脱敏。
 
+GitHub Pages 并非所有套餐都支持私有仓库发布。如果源仓库需要保持私有，推荐把脱敏后的 `dist/` 发布到 Vercel，或发布到单独的公开 Pages 仓库；源码和 Release PDF 仍保留在私有仓库。
+
 面向目标岗位的 Agent 流程示例：
 
 ```bash

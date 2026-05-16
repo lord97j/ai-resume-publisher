@@ -137,7 +137,7 @@ jobs:
           fi
 
   deploy-pages:
-    if: github.ref_name == 'main'
+    if: github.ref_name == 'main' && github.event.repository.private == false
     needs: build-and-publish
     runs-on: ubuntu-latest
     environment:
