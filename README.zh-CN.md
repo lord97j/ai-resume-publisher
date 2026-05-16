@@ -187,6 +187,7 @@ node scripts/recommend-style.js --role "AI 研究"
 - 如果 `publisher.redact` 包含 `company`，公开经历里的公司名会用 `**` 做中间脱敏。
 
 GitHub Pages 并非所有套餐都支持私有仓库发布。如果源仓库需要保持私有，推荐把脱敏后的 `dist/` 发布到 Vercel，或发布到单独的公开 Pages 仓库；源码和 Release PDF 仍保留在私有仓库。
+如果实际公开地址不是默认 GitHub Pages 地址，在 `publisher.publicUrl` 中写入真实 URL，Release notes 会用它输出简历和解密链接。
 
 面向目标岗位的 Agent 流程示例：
 

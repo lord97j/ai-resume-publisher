@@ -187,6 +187,7 @@ This repo uses a GitHub Pages aggregation workflow for role-specific resumes:
 - If `publisher.redact` includes `company`, public experience company names are masked with `**`.
 
 GitHub Pages may not be available for private repositories on every GitHub plan. For private source repositories, publish the redacted `dist/` artifact to Vercel or to a separate public Pages repository, while keeping source and Release PDFs private.
+Set `publisher.publicUrl` when the actual public URL is not the default GitHub Pages URL; release notes will use it for resume and decrypt links.
 
 Example Agent flow for a target role:
 

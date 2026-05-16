@@ -100,6 +100,10 @@ jobs:
           REPO_NAME="${GITHUB_REPOSITORY#*/}"
           OWNER="${GITHUB_REPOSITORY_OWNER}"
           BASE_URL="https://${OWNER}.github.io/${REPO_NAME}/"
+          CONFIG_URL="$(node -e "const fs = require('fs'); const resume = JSON.parse(fs.readFileSync('resume.json', 'utf8')); process.stdout.write(resume.publisher?.publicUrl || '')")"
+          if [[ -n "$CONFIG_URL" ]]; then
+            BASE_URL="$(printf '%s' "$CONFIG_URL" | sed 's#/*$#/#')"
+          fi
           NOTES="Automated resume PDF export for ${GITHUB_SHA}."
           NOTES="${NOTES}"$'\n\n'"**Resume URL**: ${BASE_URL}"
           if [[ "$REPOSITORY_PRIVATE" == "true" ]]; then
@@ -128,6 +132,10 @@ jobs:
           REPO_NAME="${GITHUB_REPOSITORY#*/}"
           OWNER="${GITHUB_REPOSITORY_OWNER}"
           BASE_URL="https://${OWNER}.github.io/${REPO_NAME}/"
+          CONFIG_URL="$(node -e "const fs = require('fs'); const resume = JSON.parse(fs.readFileSync('resume.json', 'utf8')); process.stdout.write(resume.publisher?.publicUrl || '')")"
+          if [[ -n "$CONFIG_URL" ]]; then
+            BASE_URL="$(printf '%s' "$CONFIG_URL" | sed 's#/*$#/#')"
+          fi
           echo "Main resume: ${BASE_URL}"
           if [[ "${{ steps.target.outputs.is_jd }}" == "true" ]]; then
             echo "JD resume: ${BASE_URL}${{ steps.target.outputs.target_folder }}/"
